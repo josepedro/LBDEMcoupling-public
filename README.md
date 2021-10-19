@@ -23,6 +23,14 @@ and a fluid phase.
 <a name="compatibility"></a>
 ## Compatibility
 
+### LIGGGHTS installation
+
+1. Clone repository:
+```console
+
+```
+
+
 Currently, LBDEMcoupling is compatible with the following versions:
 * LIGGGHTS 3.1
 * Palabos v1.5r1

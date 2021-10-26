@@ -58,11 +58,11 @@ void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
   subtractInPlace(p,1.);
   vtkOut.writeData<float>(p,"pressure",p_fact ); 
   
-  // IBscalarQuantity sf = SolidFraction;
-  // applyProcessingFunctional(new GetScalarQuantityFromDynamicsFunctional<T,DESCRIPTOR,T>(sf),
-  //                           lattice.getBoundingBox(),lattice,p);
+  IBscalarQuantity sf = SolidFraction;
+  applyProcessingFunctional(new GetScalarQuantityFromDynamicsFunctional<T,DESCRIPTOR,T>(sf),
+                            lattice.getBoundingBox(),lattice,p);
 
-  // vtkOut.writeData<float>(p,"solidfraction",1. ); 
+  vtkOut.writeData<float>(p,"solidfraction",1. ); 
 
 
   pcout << "wrote " << fname << std::endl;

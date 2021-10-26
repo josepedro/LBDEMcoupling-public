@@ -1,8 +1,7 @@
 # LBDEMcoupling
 
 * [About](#about)
-* [Compatibility](#compatibility)
-* [Installation](#installation)
+* [Requirements](#requirements)
 * [Setting Up a Simulation](#setting_up)
 * [Implicit Assumptions, Known Issues](#assumptions)
 * [Gallery](#gallery)
@@ -20,137 +19,58 @@ LIGGGHTS® (http://www.ligggghts.com). It implements the model of Noble
 and Torczinsky [[1]](#ref1) for resolved coupling between particles
 and a fluid phase.
 
-<a name="compatibility"></a>
-## Compatibility
+<a name="requirements"></a>
+## Requirements
 
 ### LIGGGHTS installation
 
-1. Clone repository:
-```console
-
-```
-
-
-Currently, LBDEMcoupling is compatible with the following versions:
-* LIGGGHTS 3.1
-* Palabos v1.5r1
-
-We are working on establishing compatibility with the latest version of LIGGGHTS. To ensure maximum compatibility, we have created a Palabos repository to be found [here](https://github.com/ParticulateFlow/Palabos-PFM). This repo contains the most recent vanilla Palabos release as well as a few minor bug fixes and some add-ons developed by PFM. It is recommended to use this version of Palabos with LBDEMcoupling.
-
-<a name="installation"></a>
-## Installation
-
-Just clone the git repo, and create the following three shell
-variables in your .bashrc:
-
-          export PALABOS_ROOT=path/to/palabos/
-          export LIGGGHTS_ROOT=path/to/liggghts/
-          export LBDEM_ROOT=path/to/lbdem/
-
-You also need to move the files
-
+1. First of all, you need to move the files from LBDEMcoupling to LIGGGHTS source code directory:
          fix_lb_coupling_onetoone.cpp
          fix_lb_coupling_onetoone.h
 
-to your LIGGGHTS installation directory and recompile LIGGGHTS from
-scratch with
+2. Clone repository:
+```console
+git clone git@github.com:CFDEMproject/LIGGGHTS-PUBLIC.git && cd LIGGGHTS-PUBLIC && git pull
+```
 
-         make clean-all; make fedora
+3. Compile the code in order to generate the executable lmp_auto:
+```console
+cd src && sed -i 's/#AUTOINSTALL_VTK = "OFF"/AUTOINSTALL_VTK = "ON"/g' MAKE/Makefile.user_default && make auto
+```
 
-where `fedora` should be replaced with your makefile name as given in the LIGGGHTS manual.
+4. Add VTK library in the path LD_LIBRARY_PATH:
+```console
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<full_path>/LIGGGHTS-PUBLIC/lib/vtk/install/lib
+```
+
+5. Compile the shared library:
+```console
+make makeshlib && make -f Makefile.shlib auto
+```
+
+6. Add LIGGGHTS libraries in the path LD_LIBRARY_PATH:
+```console
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:<full_path>/LIGGGHTS-PUBLIC/src
+```
 
 <a name="setting_up"></a>
 ## Setting Up a Simulation
 
-It is assumed that you have basic knowledge in both Palabos and
-LIGGGHTS. If you are not familiar with one or both of the codes, it is
-strongly recommended that you work through a few tutorial and example
-cases.
+### CMakeLists.txt settings
 
-To compile a case, it is necessary to build LIGGGHTS as a
-library. This is explained in the LIGGGHTS documentation. Both shared and static libraries of LIGGGHTS can be used with LBDEMcoupling, although the latter is considered deprecated. Newly added example cases will most likely use shared libraries.
-
-### Makefile settings
-LBDEMcoupling uses the Palabos build system (Makefile frontend with SCons backend). A few settings are required to ensure case compilation will find all the required resources. Here is an example makefile:
-
-```make
-##########################################################################
-## Makefile for the LBDEMcoupling example program benchmark
-##
-## The present Makefile is a pure configuration file, in which
-## you can select compilation options. Compilation dependencies
-## are managed automatically through the Python library SConstruct.
-##
-## If you don't have Python, or if compilation doesn't work for other
-## reasons, consult the Palabos user's guide for instructions on manual
-## compilation.
-##########################################################################
-
-# USE: multiple arguments are separated by spaces.
-#   For example: projectFiles = file1.cpp file2.cpp
-#                optimFlags   = -O -finline-functions
-
-# Leading directory of the Palabos source code
-palabosRoot  = ${PALABOS_ROOT}
-# Name of source files in current directory to compile and link with Palabos
-projectFiles = benchmark.cpp \
-          ${LBDEM_ROOT}/src/liggghtsCouplingWrapper.cpp \ 
-          ${LBDEM_ROOT}/src/latticeDecomposition.cpp
-
-# Set optimization flags on/off
-optimize     = true
-# Set debug mode and debug flags on/off
-debug        = false
-# Set profiling flags on/off
-profile      = false
-# Set MPI-parallel mode on/off (parallelism in cluster-like environment)
-MPIparallel  = true
-# Set SMP-parallel mode on/off (shared-memory parallelism)
-SMPparallel  = false
-# Decide whether to include calls to the POSIX API. On non-POSIX systems,
-#   including Windows, this flag must be false, unless a POSIX environment is
-#   emulated (such as with Cygwin).
-usePOSIX     = true
-# Path to external libraries (other than Palabos)
-libraryPaths = ${LIGGGHTS_ROOT}/src/
-# Path to inlude directories (other than Palabos)
-includePaths = ${LBDEM_ROOT}/src/ ${LIGGGHTS_ROOT}/src
-# Dynamic and static libraries (other than Palabos)
-libraries = liblammps.so
-
-# Compiler to use without MPI parallelism
-serialCXX    = g++
-# Compiler to use with MPI parallelism
-parallelCXX  = mpicxx
-# General compiler flags (e.g. -Wall to turn on all warnings on g++)
-compileFlags = -Wnon-virtual-dtor -Wno-write-strings
-# General linker flags (don't put library includes into this flag)
-# replace -llmp_fedora with the name of your library!
-linkFlags    = 
-# Compiler flags to use when optimization mode is on
-optimFlags   = -O3
-# Compiler flags to use when debug mode is on
-debugFlags   = -g
-# Compiler flags to use when profile mode is on
-profileFlags = -pg
+In order to run the examples you just need to modify the following fields with the correct paths:
+```console
+set(PALABOS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/palabos")
+set(LIGGGHTS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGHTS-PUBLIC")
+set(LBDEM_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public")
 ```
 
-The paths are set through the shell variables `${PALABOS_ROOT}`, `${LIGGGHTS_ROOT}`, and `${LBDEM_ROOT}`. The two addidional source files are part of LBDEMcoupling, and need to be given explicitly. Future versions might detect this dependency automatically. `${LIGGGHTS_ROOT}` and `${LBDEM_ROOT}` are given as include paths because headers from these directories are needed. The other settings are more or less self-explanatory, and are explained in more detail in the Palabos documentation.
+And then you just need to go inside 'build' folder and proceed with:
+```console
+cmake .. && make -j
+```
 
-#### Static Libraries
-If, for some reason, you are restricted to a static LIGGGHTS library, linking can still be done. Due to some LIGGGHTS internals, the makefile needs to be adjusted: The section 
-
-          libraries = liblammps.so
-          
-needs to be replaced with
-
-          libraries =
-          
-and the static library is linked to the case with
-
-          linkFlags    = -Wl,--whole-archive -llmp_fedora -Wl,--no-whole-archive
-
-Of course, replace `-llmp_fedora` and the like with your library name.
+And finally you have the binary created.
 
 ### Coupling API
 

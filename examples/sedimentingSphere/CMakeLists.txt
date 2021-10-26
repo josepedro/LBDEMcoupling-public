@@ -3,10 +3,10 @@ set(PALABOS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/palabos
 set(LIGGGHTS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGHTS-PUBLIC")
 set(LBDEM_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public")
 
-project(LBDEMcouplingBenchmark)
+project(LBDEMcouplingSedimentingSphere)
 enable_language(CXX)
 
-set(EXECUTABLE_NAME "benchmark")
+set(EXECUTABLE_NAME "sedimentingSphere")
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "../")
 
 if(NOT CMAKE_BUILD_TYPE)

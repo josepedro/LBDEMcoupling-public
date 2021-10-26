@@ -65,9 +65,9 @@ set(LIGGGHTS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGH
 set(LBDEM_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public")
 ```
 
-And then you just need to go inside 'build' folder and proceed with:
+And then you just need go inside of one examples folder and proceed with:
 ```console
-cmake .. && make -j
+mkdir build && cd build && cmake .. && make -j
 ```
 
 And finally you have the binary created.

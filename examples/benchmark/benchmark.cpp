@@ -68,8 +68,10 @@ using namespace std;
 
 typedef double T;
 
-#define DESCRIPTOR descriptors::D3Q19Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new BGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+#define DESCRIPTOR descriptors::D3Q27Descriptor
+#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DESCRIPTOR descriptors::D3Q19Descriptor
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 
 void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
               IncomprFlowParam<T> const& parameters,
@@ -160,6 +162,18 @@ int main(int argc, char* argv[]) {
 
     IncomprFlowParam<T> parameters(units.getLbParam());
 
+    /*
+    ///// Initialize the diagonal relaxation matrix from the .xml file.
+    // Q19 and Q27 do not have the same number of relaxation parameters!
+    Array<T, DESCRIPTOR<T>::numRelaxationTimes> allOmega;
+    allOmega[0] = parameters.getOmega();     // relaxation of M200 and cyclic permutations
+    allOmega[1] = parameters.getOmega();     // relaxation of M110 and cyclic permutations
+    allOmega[2] = 1.0;    // relaxation of M210 and cyclic permutations
+    allOmega[3] = 1.0;    // relaxation of M220 and cyclic permutations
+    allOmega[4] = 1.0; // relaxation of bulk moment (M200 + M020 + M002)
+    RRdynamics<T,DESCRIPTOR>::allOmega = allOmega;
+    */
+
     plint nx = parameters.getNx(), ny = parameters.getNy(), nz = parameters.getNz();
 
     // get lattice decomposition from LIGGGHTS and create lattice according to parallelization
@@ -219,10 +233,11 @@ int main(int argc, char* argv[]) {
     clock_t loop = clock();
     clock_t end = clock(); 
     // Loop over main time iteration.
-    for (plint iT=0; iT<=maxSteps; ++iT) {
+    //for (plint iT=0; iT<=maxSteps; ++iT) {
+    for (plint iT=0; iT<=10; ++iT) {
 
       bool initWithVel = false;
-      setSpheresOnLattice(lattice,wrapper,units,initWithVel);
+      //setSpheresOnLattice(lattice,wrapper,units,initWithVel);
       
 
       if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
@@ -230,9 +245,9 @@ int main(int argc, char* argv[]) {
 
       lattice.collideAndStream();
 
-      getForcesFromLattice(lattice,wrapper,units);
+      //getForcesFromLattice(lattice,wrapper,units);
 
-      wrapper.run(demSubsteps);
+      //wrapper.run(demSubsteps);
 
 
       if(iT%logSteps == 0){

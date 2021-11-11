@@ -30,6 +30,12 @@ with the parameters
 contain subdirectories outDir/post and outDir/tmp for LIGGGHTS and
 Palabos data respectively.
 
+E.g.:
+
+```
+mpirun -np 6 showcaseRectChannel 100 986.1 0.01 0.021 0.02 8 0.00902 outDir/
+```
+
 ## Results
 
 Depending on solid fraction and Reynolds number, pattern formation

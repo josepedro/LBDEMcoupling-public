@@ -151,7 +151,7 @@ int main(int argc, char* argv[]) {
 
     T g = 9.81;
 
-    const T lx = 1., ly = 1., lz = 2.;
+    const T lx = 2., ly = 2., lz = 2.;
 
 
     T r_ = d_part/2.;

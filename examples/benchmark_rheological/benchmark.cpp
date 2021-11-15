@@ -60,6 +60,7 @@ Particle Reynolds number ~300
 #include "library.h"
 #include "library_cfd_coupling.h"
 
+#include "periodicPressureFunctionals3D.h"
 #include "liggghtsCouplingWrapper.h"
 #include "latticeDecomposition.h"
 
@@ -204,7 +205,19 @@ int main(int argc, char* argv[]) {
 
     writeLogFile(parameters, "sedimenting spheres benchmark");
 
+    // periodic boundary condition on axis X
+    lattice.periodicity().toggle(0,true);
+    Box3D inlet(0,0,1,ny-2,1,nz-2), outlet(nx-1,nx-1,1,ny-2,1,nz-2);
+    
+    T deltaRho = 0.000001;
+    // T rhoHi = 1.+0.5*deltaRho, rhoLo = 1.-0.5*deltaRho;
+    T rhoHi = 1., rhoLo = 1.-deltaRho;
 
+    // initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
+    //                          PressureGradient<T>(rhoHi,rhoLo,nz,0) );
+    initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
+                             PoiseuilleProfileAndPressureGradient<T>(rhoHi,rhoLo,uMax,nx,ny,nz,0) );
+    
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;
@@ -242,7 +255,18 @@ int main(int argc, char* argv[]) {
       if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
 
+      T rhoAvgIn = computeAverageDensity(lattice,inlet);
+      T rhoAvgOut = computeAverageDensity(lattice,outlet);
+
       lattice.collideAndStream();
+
+      // applying a pressure gradient across the periodic boundary 
+      applyProcessingFunctional
+      (new ZhangPeriodicPressureFunctional3D<T,DESCRIPTOR>(rhoHi, 
+                       rhoAvgOut,0,1), inlet, lattice);
+      applyProcessingFunctional
+      (new ZhangPeriodicPressureFunctional3D<T,DESCRIPTOR>(rhoLo, 
+                       rhoAvgIn,0,-1), outlet, lattice);
 
       getForcesFromLattice(lattice,wrapper,units);
 

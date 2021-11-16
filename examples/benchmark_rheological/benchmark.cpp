@@ -169,8 +169,8 @@ int main(int argc, char* argv[]) {
     Array<T, DESCRIPTOR<T>::numRelaxationTimes> allOmega;
     allOmega[0] = parameters.getOmega();     // relaxation of M200 and cyclic permutations
     allOmega[1] = parameters.getOmega();     // relaxation of M110 and cyclic permutations
-    allOmega[2] = 1.0;    // relaxation of M210 and cyclic permutations
-    allOmega[3] = 1.0;    // relaxation of M220 and cyclic permutations
+    allOmega[2] = parameters.getOmega();    // relaxation of M210 and cyclic permutations
+    allOmega[3] = parameters.getOmega();    // relaxation of M220 and cyclic permutations
     allOmega[4] = 1.0; // relaxation of bulk moment (M200 + M020 + M002)
     RRdynamics<T,DESCRIPTOR>::allOmega = allOmega;
     

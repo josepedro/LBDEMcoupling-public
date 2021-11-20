@@ -69,10 +69,10 @@ using namespace std;
 
 typedef double T;
 
-//#define DESCRIPTOR descriptors::D3Q27Descriptor
-//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
-#define DESCRIPTOR descriptors::D3Q19Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+#define DESCRIPTOR descriptors::D3Q27Descriptor
+#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DESCRIPTOR descriptors::D3Q19Descriptor
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 
 void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
               IncomprFlowParam<T> const& parameters,

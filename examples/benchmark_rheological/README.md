@@ -35,6 +35,11 @@ In my case:
 mpirun -np 4 benchmark 0.1 5 0.5 1e-4 0.15 0.02 outDir/
 ```
 
+In my case for volume fraction = 0.48837352321700817:
+```
+mpirun -np 6 benchmark 0.1 5 0.5 1e-4 0.15 0.02 outDir_test/
+```
+
 A few working parameter sets are:
 ```
 ./benchmark 0.1 5 0.1 1e-4 0.15 0.02 your/out/dir

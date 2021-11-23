@@ -61,7 +61,7 @@ group       nve_group region box
 lattice     sc $d
 create_atoms    1 region mesh
 set     group all density 1100 diameter $d
-fix        1 all nve/sphere
+fix        1 all nve/sphere # NVE: constant number (N), volume (V), and energy (E); the sum of kinetic (KE) and potential energy (PE) is conserved.
 #apply nve integration to all particles that are inserted as single particles
 #fix     integr nve_group nve/sphere
 

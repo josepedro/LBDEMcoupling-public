@@ -149,9 +149,6 @@ int main(int argc, char* argv[]) {
     
     wrapper.execFile("in.lbdem");
 
-
-    T g = 9.81;
-
     const T lx = 2., ly = 2., lz = 2.;
 
 
@@ -206,24 +203,22 @@ int main(int argc, char* argv[]) {
 
     writeLogFile(parameters, "sedimenting spheres benchmark");
 
-    // periodic boundary condition on axis X
-    lattice.periodicity().toggle(0,true);
-    Box3D inlet(0,0,1,ny-2,1,nz-2), outlet(nx-1,nx-1,1,ny-2,1,nz-2);
-    
-    T deltaRho = 0.000001;
-    // T rhoHi = 1.+0.5*deltaRho, rhoLo = 1.-0.5*deltaRho;
-    T rhoHi = 1., rhoLo = 1.-deltaRho;
+    lattice.periodicity().toggle(0,true); // periodic boundary condition on axis X
+    lattice.periodicity().toggle(1,true); // periodic boundary condition on axis Y
 
-    // initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
-    //                          PressureGradient<T>(rhoHi,rhoLo,nz,0) );
-    initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
-                             PoiseuilleProfileAndPressureGradient<T>(rhoHi,rhoLo,uMax,nx,ny,nz,0) );
-    
+    // set strain rate
+    T vel = units.getLbVel(0.1);
+    Box3D top(0, nx-1, 0, ny-1, nz-1, nz-1);
+    OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
+      createLocalBoundaryCondition3D<T, DESCRIPTOR>();
+    boundaryCondition->addVelocityBoundary1P(top, lattice);
+    setBoundaryVelocity(lattice, top, Array<T, 3>(vel, 0., 0.));
+    initializeAtEquilibrium(lattice, top, 1.0, Array<T, 3>(vel, 0., 0.));
+
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;
     T dt_dem = dt_phys/(T)demSubsteps;
-
 
     pcout << "------------------------------\n"
           << "omega: " << parameters.getOmega() << "\n" 
@@ -239,7 +234,6 @@ int main(int argc, char* argv[]) {
     wrapper.setVariable("dmp_stp",vtkSteps*demSubsteps);
     wrapper.setVariable("dmp_dir",demOutDir);
 
-
     wrapper.execFile("in2.lbdem");
     wrapper.runUpto(demSubsteps-1);
 
@@ -251,28 +245,15 @@ int main(int argc, char* argv[]) {
 
       bool initWithVel = false;
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
-      
 
       if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
 
-      T rhoAvgIn = computeAverageDensity(lattice,inlet);
-      T rhoAvgOut = computeAverageDensity(lattice,outlet);
-
       lattice.collideAndStream();
-
-      // applying a pressure gradient across the periodic boundary 
-      applyProcessingFunctional
-      (new ZhangPeriodicPressureFunctional3D<T,DESCRIPTOR>(rhoHi, 
-                       rhoAvgOut,0,1), inlet, lattice);
-      applyProcessingFunctional
-      (new ZhangPeriodicPressureFunctional3D<T,DESCRIPTOR>(rhoLo, 
-                       rhoAvgIn,0,-1), outlet, lattice);
 
       getForcesFromLattice(lattice,wrapper,units);
 
       wrapper.run(demSubsteps);
-
 
       if(iT%logSteps == 0){
         end = clock();

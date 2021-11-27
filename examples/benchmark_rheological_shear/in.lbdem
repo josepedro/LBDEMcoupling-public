@@ -5,7 +5,7 @@ atom_modify	map array
 
 communicate	single vel yes
 
-boundary	p f f
+boundary	p p f
 newton		off
 
 processors * * *
@@ -35,10 +35,10 @@ pair_coeff	* *
 
 #fix xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.
 #fix xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 2.
-fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
-fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 2.
+#fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
+#fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 2.
 fix zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.
-fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 2.
+fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 2. shear x 0.1
 
 # Inserting particles
 #fix		1 all nve/sphere

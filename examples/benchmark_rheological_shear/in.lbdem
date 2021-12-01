@@ -54,8 +54,8 @@ fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane
 # ${v_frac}
 
 #region and insertion (dense pack)
-variable    d equal 2*${r_part}*1.0287
-#variable    d equal 2*${r_part}
+#variable    d equal 2*${r_part}*1.0287
+variable    d equal 2*${r_part}
 region      mesh mesh/tet file data/rheological_subdomain_2.vtk  scale 1. move 0. 0. 0.  rotate 0. 0. 0. units box
 group       nve_group region box
 lattice     sc $d

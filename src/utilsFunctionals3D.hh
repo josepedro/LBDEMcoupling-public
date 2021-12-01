@@ -23,7 +23,7 @@ namespace plb {
   template<typename T>
   CoutteProfile<T>::CoutteProfile(T uMax_, 
     plint nx_, plint ny_, plint nz_,
-    plint dimension_, plint direction_, bool positiveDirection_,
+    plint dimension_, bool positiveDirection_,
     plint verticalDirection_)
     : uMax(uMax_), nx(nx_), ny(ny_), nz(nz_), dimension(dimension_), 
     positiveDirection(positiveDirection_), verticalDirection(verticalDirection_)
@@ -33,6 +33,7 @@ namespace plb {
     (plint iX, plint iY, plint iZ, T& density, Array<T,3>& velocity) const
   {
     velocity.resetToZero();
+    density = 1.0;
     T h = 0;
     T hMax = 0;
     switch(verticalDirection){

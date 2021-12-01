@@ -60,7 +60,7 @@ Particle Reynolds number ~300
 #include "library.h"
 #include "library_cfd_coupling.h"
 
-#include "periodicPressureFunctionals3D.h"
+#include "utilsFunctionals3D.h"
 #include "liggghtsCouplingWrapper.h"
 #include "latticeDecomposition.h"
 
@@ -217,12 +217,8 @@ int main(int argc, char* argv[]) {
     setBoundaryVelocity(lattice, top, Array<T, 3>(vel, 0., 0.));
     initializeAtEquilibrium(lattice, top, 1.0, Array<T, 3>(vel, 0., 0.));
 
-    // initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
-    //                          PressureGradient<T>(rhoHi,rhoLo,nz,0) );
-
-    //CoutteProfile<T>(vel,nx,ny,nz,0,true,2)
-    //initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
-    //                         CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
+    initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
+                             CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
     
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
@@ -255,7 +251,7 @@ int main(int argc, char* argv[]) {
       bool initWithVel = false;
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
 
-      if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
+      if(iT%vtkSteps == 0 /*&& iT > 0*/) // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
 
       lattice.collideAndStream();

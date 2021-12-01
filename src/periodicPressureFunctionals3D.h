@@ -146,18 +146,6 @@ namespace plb {
     T poiseuilleVelocity(T i, T n) const;
   };
 
-  template<typename T>
-  class CoutteProfile {
-  public:
-    CoutteProfile(T uMax_, plint nx_, plint ny_, plint nz_, 
-      plint dimension_, bool positiveDirection_, plint verticalDirection_);
-    void operator() (plint iX, plint iY, plint iZ, T& density, Array<T,3>& velocity) const;
-  private:
-    T uMax;
-    plint nx,ny,nz,dimension,verticalDirection;
-    bool positiveDirection;
-  };
-
 }; /* namespace plb */
 
 #include "periodicPressureFunctionals3D.hh"

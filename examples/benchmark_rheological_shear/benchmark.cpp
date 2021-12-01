@@ -217,6 +217,13 @@ int main(int argc, char* argv[]) {
     setBoundaryVelocity(lattice, top, Array<T, 3>(vel, 0., 0.));
     initializeAtEquilibrium(lattice, top, 1.0, Array<T, 3>(vel, 0., 0.));
 
+    // initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
+    //                          PressureGradient<T>(rhoHi,rhoLo,nz,0) );
+
+    //CoutteProfile<T>(vel,nx,ny,nz,0,true,2)
+    //initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
+    //                         CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
+    
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;

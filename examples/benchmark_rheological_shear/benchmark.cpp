@@ -244,15 +244,24 @@ int main(int argc, char* argv[]) {
 
     clock_t start = clock();
     clock_t loop = clock();
-    clock_t end = clock(); 
+    clock_t end = clock();
+    // Outputing information
+    std::string fname_energy(global::directories().getOutputDir() + "lattice_average_energy.csv");
+    //std::string fn = createFileName("./tmp/fluidvel_"+util::val2str(xValue)+"_", iter, 6)+".dat";
+    plb_ofstream ofile_energy(fname_energy.c_str());
+    ofile_energy << "iT" << "," << "average_energy" << std::endl;
     // Loop over main time iteration.
     for (plint iT=0; iT<=maxSteps; ++iT) {
 
       bool initWithVel = false;
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
 
-      if(iT%vtkSteps == 0 /*&& iT > 0*/) // LIGGGHTS does not write at timestep 0
+      if(iT%vtkSteps == 0 && iT > 0) { // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
+        // writing files here
+        ofile_energy << setprecision(10) << iT << ","
+          << setprecision(10) << getStoredAverageEnergy<T>(lattice) << std::endl;
+      }
 
       lattice.collideAndStream();
 
@@ -276,5 +285,7 @@ int main(int argc, char* argv[]) {
     pcout << " ********************** \n"
           << "total time: " << totaltime
           << " calculating at " << totalmlups << " MLU/s" << std::endl;
+
+    ofile_energy.close();
 
 }

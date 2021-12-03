@@ -245,11 +245,22 @@ int main(int argc, char* argv[]) {
     clock_t start = clock();
     clock_t loop = clock();
     clock_t end = clock();
+    
     // Outputing information
+    // Energy
     std::string fname_energy(global::directories().getOutputDir() + "lattice_average_energy.csv");
-    //std::string fn = createFileName("./tmp/fluidvel_"+util::val2str(xValue)+"_", iter, 6)+".dat";
     plb_ofstream ofile_energy(fname_energy.c_str());
     ofile_energy << "iT" << "," << "average_energy" << std::endl;
+
+    // Physical Velocity
+    std::string fname_velocity_x(global::directories().getOutputDir() + "lattice_average_velocity_x.csv");
+    plb_ofstream ofile_velocity_x(fname_velocity_x.c_str());
+    ofile_velocity_x << "iT";
+    for (plint iZ = 0; iZ < nz; ++iZ) {
+      ofile_velocity_x << "," << iZ;
+    }
+    ofile_velocity_x << std::endl;
+    
     // Loop over main time iteration.
     for (plint iT=0; iT<=maxSteps; ++iT) {
 
@@ -259,8 +270,17 @@ int main(int argc, char* argv[]) {
       if(iT%vtkSteps == 0 && iT > 0) { // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
         // writing files here
-        ofile_energy << setprecision(10) << iT << ","
-          << setprecision(10) << getStoredAverageEnergy<T>(lattice) << std::endl;
+        // Energy
+        ofile_energy << iT << "," << setprecision(10) << getStoredAverageEnergy<T>(lattice) << std::endl;
+
+        // Physical Velocity
+        ofile_velocity_x << iT;
+        for (plint iZ = 0; iZ < nz; ++iZ) {
+          ofile_velocity_x << "," << units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                    Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
+                                                    0)));
+        }
+        ofile_velocity_x << std::endl;
       }
 
       lattice.collideAndStream();
@@ -287,5 +307,5 @@ int main(int argc, char* argv[]) {
           << " calculating at " << totalmlups << " MLU/s" << std::endl;
 
     ofile_energy.close();
-
+    ofile_velocity_x.close();
 }

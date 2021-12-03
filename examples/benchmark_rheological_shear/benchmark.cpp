@@ -260,6 +260,16 @@ int main(int argc, char* argv[]) {
       ofile_velocity_x << "," << iZ;
     }
     ofile_velocity_x << std::endl;
+
+    // Physical Velocity Gradient
+    std::string fname_velocity_gradient_x(
+      global::directories().getOutputDir() + "lattice_average_velocity_gradient_x.csv");
+    plb_ofstream ofile_velocity_gradient_x(fname_velocity_gradient_x.c_str());
+    ofile_velocity_gradient_x << "iT";
+    for (plint iZ = 0; iZ < nz - 1; ++iZ) {
+      ofile_velocity_gradient_x << "," << iZ;
+    }
+    ofile_velocity_gradient_x << std::endl;
     
     // Loop over main time iteration.
     for (plint iT=0; iT<=maxSteps; ++iT) {
@@ -281,6 +291,19 @@ int main(int argc, char* argv[]) {
                                                     0)));
         }
         ofile_velocity_x << std::endl;
+
+        // Physical Velocity Gradient
+        ofile_velocity_gradient_x << iT;
+        for (plint iZ = 0; iZ < nz - 1; ++iZ) {
+          T velocity_gradient = ( units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                    Box3D(0, nx - 1, 0, ny - 1, iZ + 1, iZ + 1),
+                                                    0))) - 
+                                  units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                    Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
+                                                    0))) )/units.getPhysLength(1);;
+          ofile_velocity_gradient_x << "," << velocity_gradient;
+        }
+        ofile_velocity_gradient_x << std::endl;
       }
 
       lattice.collideAndStream();
@@ -308,4 +331,5 @@ int main(int argc, char* argv[]) {
 
     ofile_energy.close();
     ofile_velocity_x.close();
+    ofile_velocity_gradient_x.close();
 }

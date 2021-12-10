@@ -151,7 +151,6 @@ int main(int argc, char* argv[]) {
 
     const T lx = 2., ly = 2., lz = 2.;
 
-
     T r_ = d_part/2.;
     T rho_s = 1100.;
     T m = r_*r_*r_*4./3.*3.14*rho_s;
@@ -159,7 +158,6 @@ int main(int argc, char* argv[]) {
     PhysUnits3D<T> units(2.*r_,v_inf,nu_f,lx,ly,lz,N,uMax,rho_f);
 
     IncomprFlowParam<T> parameters(units.getLbParam());
-
     
     ///// Initialize the diagonal relaxation matrix from the .xml file.
     // Q19 and Q27 do not have the same number of relaxation parameters!
@@ -170,7 +168,6 @@ int main(int argc, char* argv[]) {
     allOmega[3] = parameters.getOmega();    // relaxation of M220 and cyclic permutations
     allOmega[4] = 1.0; // relaxation of bulk moment (M200 + M020 + M002)
     RRdynamics<T,DESCRIPTOR>::allOmega = allOmega;
-    
 
     plint nx = parameters.getNx(), ny = parameters.getNy(), nz = parameters.getNz();
 
@@ -189,14 +186,13 @@ int main(int argc, char* argv[]) {
                defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
                new DYNAMICS );
 
-    defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);
-    
+    defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
     
     //const T maxT = ceil(3.*lz/v_inf);
-    const T maxT = ceil(3.*lz/v_inf)*12*2;
-    const T vtkT = 0.1;
+    const T maxT = ceil(3.*lz/v_inf)*12*2*3;
+    //const T vtkT = 0.1;
     //const T vtkT = 1.4;
-    //const T vtkT = 2.0;
+    const T vtkT = 4.0;
     const T logT = 0.0000001;
 
     const plint maxSteps = units.getLbSteps(maxT);
@@ -209,17 +205,17 @@ int main(int argc, char* argv[]) {
     lattice.periodicity().toggle(1,true); // periodic boundary condition on axis Y
 
     // set strain rate
-    T vel = units.getLbVel(0.1);
+    T vel = units.getLbVel(0.0025);
     Box3D top(0, nx-1, 0, ny-1, nz-1, nz-1);
     OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
       createLocalBoundaryCondition3D<T, DESCRIPTOR>();
     boundaryCondition->addVelocityBoundary1P(top, lattice);
     setBoundaryVelocity(lattice, top, Array<T, 3>(vel, 0., 0.));
     initializeAtEquilibrium(lattice, top, 1.0, Array<T, 3>(vel, 0., 0.));
-
+/*
     initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
                              CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
-    
+*/  
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;
@@ -286,9 +282,9 @@ int main(int argc, char* argv[]) {
         // Physical Velocity
         ofile_velocity_x << iT;
         for (plint iZ = 0; iZ < nz; ++iZ) {
-          ofile_velocity_x << "," << units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
-                                                    Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
-                                                    0)));
+          ofile_velocity_x << "," << setprecision(10) << units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                         Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
+                                                         0)));
         }
         ofile_velocity_x << std::endl;
 
@@ -301,7 +297,7 @@ int main(int argc, char* argv[]) {
                                   units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
                                                     Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
                                                     0))) )/units.getPhysLength(1);;
-          ofile_velocity_gradient_x << "," << velocity_gradient;
+          ofile_velocity_gradient_x << "," << setprecision(10) << velocity_gradient;
         }
         ofile_velocity_gradient_x << std::endl;
       }

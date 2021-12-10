@@ -9,7 +9,7 @@ boundary	p p f
 newton		off
 
 processors * * *
-region		box block 0. 2. 0. 2. 0. 2. units box
+region		box block 0. 0.01 0. 0.001 0. 0.002 units box
 create_box	1 box
 
 variable	skin equal 0.01
@@ -19,11 +19,12 @@ neigh_modify	delay 0 binsize 0.01 one 1000
 fix grav all gravity 0.0 vector 0 0 -1
 
 
-fix 		m1 all property/global youngsModulus peratomtype 1e8
-fix 		m2 all property/global poissonsRatio peratomtype 0.4
-fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.95
-fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.45
-fix 		m5 all property/global coefficientRollingFriction peratomtypepair 1 0.020
+# Basalt
+fix 		m1 all property/global youngsModulus peratomtype 57e9
+fix 		m2 all property/global poissonsRatio peratomtype 0.25
+fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.1
+fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.576
+fix 		m5 all property/global coefficientRollingFriction peratomtypepair 1 0.576
 
 # lb coupling fix
 fix lbcoupling all couple/lb/onetoone
@@ -47,11 +48,6 @@ fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane
 #region  insreg block 0.0 2.0 0.0 2.0 0.0 2.0 units box
 #fix ins all insert/pack seed 32452843 distributiontemplate pdd1 insert_every once &
                         overlapcheck yes volumefraction_region ${v_frac} region insreg ntry_mc 10000 
-
-# Variables of input
-# ${skin}
-# ${r_part}
-# ${v_frac}
 
 #region and insertion (dense pack)
 #variable    d equal 2*${r_part}*1.0287

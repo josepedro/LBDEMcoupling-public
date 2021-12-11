@@ -5,7 +5,7 @@ atom_modify	map array
 
 communicate	single vel yes
 
-boundary	p p f
+boundary	p f p
 newton		off
 
 processors * * *
@@ -18,7 +18,6 @@ neigh_modify	delay 0 binsize 0.01 one 1000
 
 fix grav all gravity 0.0 vector 0 0 -1
 
-
 # Basalt
 fix 		m1 all property/global youngsModulus peratomtype 57e9
 fix 		m2 all property/global poissonsRatio peratomtype 0.25
@@ -29,30 +28,17 @@ fix 		m5 all property/global coefficientRollingFriction peratomtypepair 1 0.576
 # lb coupling fix
 fix lbcoupling all couple/lb/onetoone
 
-
 pair_style	gran model hertz tangential history rolling_friction cdt
 pair_coeff	* *
 
-
-#fix xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.
-#fix xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 2.
-#fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
-#fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 2.
-fix zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.
-fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 2. shear x 0.0025
-
-# Inserting particles
-#fix		1 all nve/sphere
-#fix pts1 all particletemplate/sphere 15485863 atom_type 1 density constant 1100 radius constant ${r_part} 
-#fix pdd1 all particledistribution/discrete 15485867  1 pts1 1.0
-#region  insreg block 0.0 2.0 0.0 2.0 0.0 2.0 units box
-#fix ins all insert/pack seed 32452843 distributiontemplate pdd1 insert_every once &
-                        overlapcheck yes volumefraction_region ${v_frac} region insreg ntry_mc 10000 
+# shear x => velocity units
+fix zwalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0. shear x 0.1
+fix zwalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.001 
 
 #region and insertion (dense pack)
 #variable    d equal 2*${r_part}*1.0287
 variable    d equal 2*${r_part}
-region      mesh mesh/tet file data/rheological_subdomain_2.vtk  scale 1. move 0. 0. 0.  rotate 0. 0. 0. units box
+region      mesh mesh/tet file data/rheological_subdomain_1.vtk  scale 1. move 0. 0. 0.  rotate 0. 0. 0. units box
 group       nve_group region box
 lattice     sc $d
 create_atoms    1 region mesh

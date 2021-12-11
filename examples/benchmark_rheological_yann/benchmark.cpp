@@ -105,55 +105,32 @@ int main(int argc, char* argv[]) {
 
     plbInit(&argc, &argv);
 
-    T uMax;
-
-    plint N;
-    
-    T nu_f,d_part,v_frac, v_inf;
-
-    std::string outDir;
-    
-    try {
-        global::argv(1).read(d_part);
-        global::argv(2).read(N);
-        global::argv(3).read(v_frac);
-        global::argv(4).read(nu_f);
-        global::argv(5).read(v_inf);
-        global::argv(6).read(uMax);
-        global::argv(7).read(outDir);
-    } catch(PlbIOException& exception) {
-        pcout << exception.what() << endl;
-        pcout << "Command line arguments:\n";
-        pcout << "1 : d_part\n";
-        pcout << "2 : N per particle diameter\n";
-        pcout << "3 : particle volume fraction\n";
-        pcout << "4 : nu_fluid\n";
-        pcout << "5 : estimated v_inf\n";
-        pcout << "6 : uMax\n";
-        pcout << "7 : outDir\n";
-        exit(1);
-    }
+    const T d_part = 2*0.0001;
+    const T dx = 2*0.00001;
+    const T dt = 6*0.0000001;
+    const T lx = 0.01, ly = 0.001, lz = 0.002;
+    const T rho_f = 1000;
+    const T r_ = d_part/2.;
+    const T dynamic_viscosity = 0.1; // (Pa.s or N.s/m^2 or kg/(m.s)) m0
+    const T nu_f =  dynamic_viscosity/rho_f; // kinematic viscosity (m^2/s)
+    const T rho_s = 2*1000;
+    const T strain_rate = 100; // (s^-1)
+    const plint N = d_part/dx; // N is the number of grid points per particle diameter
+    const T v_inf = ly*strain_rate;
+    const T uMax = v_inf*(dt/dx);
+    const std::string outDir = "outDir/";
 
     std::string lbOutDir(outDir), demOutDir(outDir);
     lbOutDir.append("tmp/"); demOutDir.append("post/");
     global::directories().setOutputDir(lbOutDir);
 
-    const T rho_f = 1000;
-
     LiggghtsCouplingWrapper wrapper(argv,global::mpi().getGlobalCommunicator());
 
     // particle size and volume fraction are handed over to LIGGGHTS 
     // as variables (see LIGGGHTS docu for details)
-    wrapper.setVariable("r_part",d_part/2);
-    wrapper.setVariable("v_frac",v_frac);
+    wrapper.setVariable("r_part",d_part/2.0);
     
     wrapper.execFile("in.lbdem");
-
-    const T lx = 2., ly = 2., lz = 2.;
-
-    T r_ = d_part/2.;
-    T rho_s = 1100.;
-    T m = r_*r_*r_*4./3.*3.14*rho_s;
     
     PhysUnits3D<T> units(2.*r_,v_inf,nu_f,lx,ly,lz,N,uMax,rho_f);
 
@@ -188,8 +165,7 @@ int main(int argc, char* argv[]) {
 
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
     
-    //const T maxT = ceil(3.*lz/v_inf);
-    const T maxT = ceil(3.*lz/v_inf)*12*2*3;
+    const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
     //const T vtkT = 0.1;
     //const T vtkT = 1.4;
     const T vtkT = 4.0;
@@ -202,16 +178,16 @@ int main(int argc, char* argv[]) {
     writeLogFile(parameters, "sedimenting spheres benchmark");
 
     lattice.periodicity().toggle(0,true); // periodic boundary condition on axis X
-    lattice.periodicity().toggle(1,true); // periodic boundary condition on axis Y
+    lattice.periodicity().toggle(2,true); // periodic boundary condition on axis Z
 
     // set strain rate
-    T vel = units.getLbVel(0.0025);
-    Box3D top(0, nx-1, 0, ny-1, nz-1, nz-1);
+    T vel = units.getLbVel(v_inf);
+    Box3D bottom(0, nx-1, 0, 0, 0, nz-1);
     OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
       createLocalBoundaryCondition3D<T, DESCRIPTOR>();
-    boundaryCondition->addVelocityBoundary1P(top, lattice);
-    setBoundaryVelocity(lattice, top, Array<T, 3>(vel, 0., 0.));
-    initializeAtEquilibrium(lattice, top, 1.0, Array<T, 3>(vel, 0., 0.));
+    boundaryCondition->addVelocityBoundary1P(bottom, lattice);
+    setBoundaryVelocity(lattice, bottom, Array<T, 3>(vel, 0., 0.));
+    initializeAtEquilibrium(lattice, bottom, 1.0, Array<T, 3>(vel, 0., 0.));
 /*
     initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
                              CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
@@ -252,8 +228,8 @@ int main(int argc, char* argv[]) {
     std::string fname_velocity_x(global::directories().getOutputDir() + "lattice_average_velocity_x.csv");
     plb_ofstream ofile_velocity_x(fname_velocity_x.c_str());
     ofile_velocity_x << "iT";
-    for (plint iZ = 0; iZ < nz; ++iZ) {
-      ofile_velocity_x << "," << iZ;
+    for (plint iY = 0; iY < ny; ++iY) {
+      ofile_velocity_x << "," << iY;
     }
     ofile_velocity_x << std::endl;
 
@@ -262,8 +238,8 @@ int main(int argc, char* argv[]) {
       global::directories().getOutputDir() + "lattice_average_velocity_gradient_x.csv");
     plb_ofstream ofile_velocity_gradient_x(fname_velocity_gradient_x.c_str());
     ofile_velocity_gradient_x << "iT";
-    for (plint iZ = 0; iZ < nz - 1; ++iZ) {
-      ofile_velocity_gradient_x << "," << iZ;
+    for (plint iY = 0; iY < ny - 1; ++iY) {
+      ofile_velocity_gradient_x << "," << iY;
     }
     ofile_velocity_gradient_x << std::endl;
     
@@ -281,21 +257,21 @@ int main(int argc, char* argv[]) {
 
         // Physical Velocity
         ofile_velocity_x << iT;
-        for (plint iZ = 0; iZ < nz; ++iZ) {
+        for (plint iY = 0; iY < ny; ++iY) {
           ofile_velocity_x << "," << setprecision(10) << units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
-                                                         Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
+                                                         Box3D(0, nx - 1, iY, iY, 0, nz - 1),
                                                          0)));
         }
         ofile_velocity_x << std::endl;
 
         // Physical Velocity Gradient
         ofile_velocity_gradient_x << iT;
-        for (plint iZ = 0; iZ < nz - 1; ++iZ) {
+        for (plint iY = 0; iY < ny - 1; ++iY) {
           T velocity_gradient = ( units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
-                                                    Box3D(0, nx - 1, 0, ny - 1, iZ + 1, iZ + 1),
+                                                    Box3D(0, nx - 1, iY, iY, 0, nz - 1),
                                                     0))) - 
                                   units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
-                                                    Box3D(0, nx - 1, 0, ny - 1, iZ, iZ),
+                                                    Box3D(0, nx - 1, iY, iY, 0, nz - 1),
                                                     0))) )/units.getPhysLength(1);;
           ofile_velocity_gradient_x << "," << setprecision(10) << velocity_gradient;
         }

@@ -12,13 +12,14 @@ processors * * *
 region		box block 0. 0.01 0. 0.001 0. 0.002 units box
 create_box	1 box
 
-variable	skin equal 0.01
+variable	skin equal 1e-5
 neighbor	${skin} bin
-neigh_modify	delay 0 binsize 0.01 one 1000
+neigh_modify	delay 0 binsize ${skin} one 1000
 
 fix grav all gravity 0.0 vector 0 0 -1
 
 # Basalt
+hard_particles yes
 fix 		m1 all property/global youngsModulus peratomtype 57e9
 fix 		m2 all property/global poissonsRatio peratomtype 0.25
 fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.1
@@ -38,7 +39,7 @@ fix zwalls2 all wall/gran model hertz tangential history primitive type 1 yplane
 #region and insertion (dense pack)
 #variable    d equal 2*${r_part}*1.0287
 variable    d equal 2*${r_part}
-region      mesh mesh/tet file data/rheological_subdomain_1.vtk  scale 1. move 0. 0. 0.  rotate 0. 0. 0. units box
+region      mesh mesh/tet file meshes/rheological_subdomain_1.vtk  scale 1. move 0. 0. 0.  rotate 0. 0. 0. units box
 group       nve_group region box
 lattice     sc $d
 create_atoms    1 region mesh

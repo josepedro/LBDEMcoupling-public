@@ -165,7 +165,8 @@ int main(int argc, char* argv[]) {
 
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
     
-    const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
+    //const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
+    const T maxT = 0.0; // Yann's thesis = 20.0/strain_rate
     //const T vtkT = 0.1;
     //const T vtkT = 1.4;
     const T vtkT = 4.0;

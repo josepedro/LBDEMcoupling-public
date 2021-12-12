@@ -119,6 +119,8 @@ int main(int argc, char* argv[]) {
     const T v_inf = ly*strain_rate;
     const T uMax = v_inf*(dt/dx);
     const std::string outDir = "outDir/";
+    const T Rep = rho_f*r_*r_*strain_rate/dynamic_viscosity; // Particle Reynolds number
+    const T volume_fraction = 0.36945129606215965; // non-newtonian -> 0.25 <= volume_fraction < volume_fraction_critic (0.5)
 
     std::string lbOutDir(outDir), demOutDir(outDir);
     lbOutDir.append("tmp/"); demOutDir.append("post/");
@@ -165,18 +167,15 @@ int main(int argc, char* argv[]) {
 
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
     
-    //const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
-    const T maxT = 0.0; // Yann's thesis = 20.0/strain_rate
-    //const T vtkT = 0.1;
-    //const T vtkT = 1.4;
-    const T vtkT = 4.0;
+    const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
+    const T vtkT = 0.0001;
     const T logT = 0.0000001;
 
     const plint maxSteps = units.getLbSteps(maxT);
     const plint vtkSteps = max<plint>(units.getLbSteps(vtkT),1);
     const plint logSteps = max<plint>(units.getLbSteps(logT),1);
 
-    writeLogFile(parameters, "sedimenting spheres benchmark");
+    writeLogFile(parameters, "Rheological Study from Yann's Thesis");
 
     lattice.periodicity().toggle(0,true); // periodic boundary condition on axis X
     lattice.periodicity().toggle(2,true); // periodic boundary condition on axis Z
@@ -204,6 +203,7 @@ int main(int argc, char* argv[]) {
           << "maxT: " << maxT << " | maxSteps: " << maxSteps << "\n"
           << "v_inf: " << v_inf << "\n"
           << "Re : " << parameters.getRe() << "\n"
+          << "Particle Reynolds number: " << Rep << "\n"
           << "vtkT: " << vtkT << " | vtkSteps: " << vtkSteps << "\n"
           << "grid size: " << nx << " " << ny << " " << nz << "\n"
           << "------------------------------" << std::endl;

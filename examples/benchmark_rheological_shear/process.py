@@ -9,11 +9,24 @@ from sklearn.metrics.pairwise import cosine_similarity
 import math
 
 if __name__ == "__main__":
-    work_dir = '/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public/examples/benchmark_rheological_yann/'
+    work_dir = '/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public/examples/benchmark_rheological_shear/'
+    '''
+    df_lattice_average_energy = dd.read_csv(work_dir + 'outDir_dalco48/outDir/tmp/lattice_average_energy.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_x = dd.read_csv(work_dir + 'outDir_dalco48/outDir/tmp/lattice_average_velocity_x.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_gradient_x = dd.read_csv(work_dir + 'outDir_dalco48/outDir/tmp/lattice_average_velocity_gradient_x.csv', sep=',').compute().dropna()
+    '''
+    #df_lattice_average_energy = dd.read_csv(work_dir + 'outDir_dalco48_long/tmp/lattice_average_energy.csv', sep=',').compute().dropna()
+    #df_physical_average_velocity_x = dd.read_csv(work_dir + 'outDir_dalco48_long/tmp/lattice_average_velocity_x.csv', sep=',').compute().dropna()
+    #df_physical_average_velocity_gradient_x = dd.read_csv(work_dir + 'outDir_dalco48_long/tmp/lattice_average_velocity_gradient_x.csv', sep=',').compute().dropna()
     
-    df_lattice_average_energy = dd.read_csv(work_dir + 'outDir_dalco48_6/outDir/tmp/lattice_average_energy.csv', sep=',').compute().dropna()
-    df_physical_average_velocity_x = dd.read_csv(work_dir + 'outDir_dalco48_6/outDir/tmp/lattice_average_velocity_x.csv', sep=',').compute().dropna()
-    df_physical_average_velocity_gradient_x = dd.read_csv(work_dir + 'outDir_dalco48_6/outDir/tmp/lattice_average_velocity_gradient_x.csv', sep=',').compute().dropna()
+    '''
+    df_lattice_average_energy = dd.read_csv(work_dir + 'less_viscosity/lattice_average_energy.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_x = dd.read_csv(work_dir + 'less_viscosity/lattice_average_velocity_x.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_gradient_x = dd.read_csv(work_dir + 'less_viscosity/lattice_average_velocity_gradient_x.csv', sep=',').compute().dropna()
+    '''
+    df_lattice_average_energy = dd.read_csv(work_dir + 'high_viscosity_low_reynolds/lattice_average_energy.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_x = dd.read_csv(work_dir + 'high_viscosity_low_reynolds/lattice_average_velocity_x.csv', sep=',').compute().dropna()
+    df_physical_average_velocity_gradient_x = dd.read_csv(work_dir + 'high_viscosity_low_reynolds/lattice_average_velocity_gradient_x.csv', sep=',').compute().dropna()
 
     fig1 = plt.figure()
     fig1.suptitle('Lattice Average Energy Through the Iterations', fontsize=20)
@@ -37,8 +50,7 @@ if __name__ == "__main__":
     ay.set_ylabel('Lattice Position on the Vertical Direction', fontsize=20)
 
     #df_physical_average_velocity_gradient_x_aux = (df_physical_average_velocity_gradient_x.iloc[len(df_physical_average_velocity_gradient_x)-9:len(df_physical_average_velocity_gradient_x)])[:].mean()[1:]
-    #df_physical_average_velocity_gradient_x_aux = (df_physical_average_velocity_gradient_x.iloc[0:len(df_physical_average_velocity_gradient_x)])[:].mean()[1:]
-    df_physical_average_velocity_gradient_x_aux = df_physical_average_velocity_x_aux[::-1].diff()[1:][::-1]
+    df_physical_average_velocity_gradient_x_aux = (df_physical_average_velocity_gradient_x.iloc[0:len(df_physical_average_velocity_gradient_x)])[:].mean()[1:]
     fig1 = plt.figure()
     fig1.suptitle('Average Velocity Gradient X Through the Vertical Direction', fontsize=20)
     ay = fig1.add_subplot(111)
@@ -49,7 +61,7 @@ if __name__ == "__main__":
     ay.set_ylabel('Lattice Position on the Vertical Direction', fontsize=20)
 
     measured_strain_rate = df_physical_average_velocity_gradient_x_aux.to_numpy()[0]
-    strain_rate = 100.0
+    strain_rate = 0.00125
     #strain_rate = 0.05
     relative_apparent_viscosity = measured_strain_rate / strain_rate
     print("relative_apparent_viscosity: " + str(relative_apparent_viscosity) )

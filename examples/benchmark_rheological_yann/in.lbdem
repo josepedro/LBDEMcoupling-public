@@ -18,13 +18,13 @@ neigh_modify	delay 0 binsize ${skin} one 1000
 
 fix grav all gravity 0.0 vector 0 0 -1
 
-# Basalt
-hard_particles yes
-fix 		m1 all property/global youngsModulus peratomtype 57e9
-fix 		m2 all property/global poissonsRatio peratomtype 0.25
-fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.1
-fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.576
-fix 		m5 all property/global coefficientRollingFriction peratomtypepair 1 0.576
+# Tuff CampiFlegrei(Italy) https://jifarquharson.github.io/research-papers/2019/Heap_et_al-2019_JVGR.pdf
+# hard_particles yes
+fix 		m1 all property/global youngsModulus peratomtype 0.5e9
+fix 		m2 all property/global poissonsRatio peratomtype 0.20
+fix 		m3 all property/global coefficientRestitution peratomtypepair 1 0.05000001
+fix 		m4 all property/global coefficientFriction peratomtypepair 1 0.000001
+fix 		m5 all property/global coefficientRollingFriction peratomtypepair 1 0.000001
 
 # lb coupling fix
 fix lbcoupling all couple/lb/onetoone

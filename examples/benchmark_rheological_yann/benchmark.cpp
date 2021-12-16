@@ -69,10 +69,12 @@ using namespace std;
 
 typedef double T;
 
+const T omega = 1.0;
+
 #define DESCRIPTOR descriptors::D3Q27Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(omega))
 //#define DESCRIPTOR descriptors::D3Q19Descriptor
-//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(omega))
 
 void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
               IncomprFlowParam<T> const& parameters,
@@ -114,7 +116,8 @@ int main(int argc, char* argv[]) {
     const T dynamic_viscosity = 0.1; // (Pa.s or N.s/m^2 or kg/(m.s)) m0
     const T nu_f =  dynamic_viscosity/rho_f; // kinematic viscosity (m^2/s)
     const T rho_s = 2*1000;
-    const T strain_rate = 100; // (s^-1)
+    //const T strain_rate = 100; // (s^-1) this comes from Yann thesis
+    const T strain_rate = 100.0/10.0; // (s^-1) this comes from an attempt
     const plint N = d_part/dx; // N is the number of grid points per particle diameter
     const T v_inf = ly*strain_rate;
     const T uMax = v_inf*(dt/dx);
@@ -141,10 +144,10 @@ int main(int argc, char* argv[]) {
     ///// Initialize the diagonal relaxation matrix from the .xml file.
     // Q19 and Q27 do not have the same number of relaxation parameters!
     Array<T, DESCRIPTOR<T>::numRelaxationTimes> allOmega;
-    allOmega[0] = parameters.getOmega();     // relaxation of M200 and cyclic permutations
-    allOmega[1] = parameters.getOmega();     // relaxation of M110 and cyclic permutations
-    allOmega[2] = parameters.getOmega();    // relaxation of M210 and cyclic permutations
-    allOmega[3] = parameters.getOmega();    // relaxation of M220 and cyclic permutations
+    allOmega[0] = omega;     // relaxation of M200 and cyclic permutations
+    allOmega[1] = omega;     // relaxation of M110 and cyclic permutations
+    allOmega[2] = omega;    // relaxation of M210 and cyclic permutations
+    allOmega[3] = omega;    // relaxation of M220 and cyclic permutations
     allOmega[4] = 1.0; // relaxation of bulk moment (M200 + M020 + M002)
     RRdynamics<T,DESCRIPTOR>::allOmega = allOmega;
 
@@ -168,7 +171,7 @@ int main(int argc, char* argv[]) {
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
     
     const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
-    const T vtkT = 0.0001;
+    const T vtkT = 0.006/8.0;
     const T logT = 0.0000001;
 
     const plint maxSteps = units.getLbSteps(maxT);
@@ -198,7 +201,7 @@ int main(int argc, char* argv[]) {
     T dt_dem = dt_phys/(T)demSubsteps;
 
     pcout << "------------------------------\n"
-          << "omega: " << parameters.getOmega() << "\n" 
+          << "omega: " << omega << "\n" 
           << "dt_phys: " << dt_phys << "\n"
           << "maxT: " << maxT << " | maxSteps: " << maxSteps << "\n"
           << "v_inf: " << v_inf << "\n"

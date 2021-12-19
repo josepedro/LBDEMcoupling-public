@@ -42,8 +42,8 @@ pair_style gran model hertz tangential history
 pair_coeff	* *
 
 # shear x => velocity units
-fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0. shear x 5.0
-# fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
+# fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0. shear x 5.0
+fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
 fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.001 
 
 reset_timestep  0

@@ -170,11 +170,11 @@ int main(int argc, char* argv[]) {
                defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
                new DYNAMICS );
 
-    defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);    
+    defineDynamics(lattice, lattice.getBoundingBox(), new DYNAMICS);    
     
     const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
     //const T vtkT = 0.006/8.0;
-    const T vtkT = 0.0001;
+    const T vtkT = 0.0000001;
     const T logT = 0.0000001;
 
     const plint maxSteps = units.getLbSteps(maxT);
@@ -189,17 +189,38 @@ int main(int argc, char* argv[]) {
     // set strain rate
     //T vel = units.getLbVel(0.0);
     T vel = units.getLbVel(v_inf);
-    Box3D bottom(0, nx-1, 0, 0, 0, nz-1);
+    Box3D bottom(0, nx - 1, ny - 1, ny - 1, 0, nz - 1);
+    Box3D lid(0, nx - 1, 0, 0, 0, nz - 1);
+    // Yann's approach
     /*
     OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
       createLocalBoundaryCondition3D<T, DESCRIPTOR>();
     boundaryCondition->addVelocityBoundary1P(bottom, lattice);
-    setBoundaryVelocity(lattice, bottom, Array<T, 3>(vel, 0., 0.));*/
-    initializeAtEquilibrium(lattice, bottom, 1.0, Array<T, 3>(vel, 0., 0.));
+    boundaryCondition->addVelocityBoundary1N(lid, lattice);
+    setBoundaryVelocity(lattice, lid, Array<T, 3>(vel, 0., 0.));
+    */
+    // VelocityBounceBack's approach
+    /*
+    VelocityBounceBack<T,DESCRIPTOR> vbbDynamics_bottom = VelocityBounceBack<T,DESCRIPTOR>(1.0, Array<T, 3>(0., 0., 0.));
+    defineDynamics(lattice, bottom, vbbDynamics_bottom.clone());
+    VelocityBounceBack<T,DESCRIPTOR> vbbDynamics_lid = VelocityBounceBack<T,DESCRIPTOR>(1.0, Array<T, 3>(vel, 0., 0.));
+    defineDynamics(lattice, lid, vbbDynamics_lid.clone());
+    */
+    // PSC's approach
+    defineDynamics(lattice, bottom, 
+      IBcompositeDynamicsSetDensityAndVelocity<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(omega),
+                        1.0, Array<T, 3>(0., 0., 0.)).clone());
+    defineDynamics(lattice, lid, 
+      IBcompositeDynamicsSetDensityAndVelocity<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(omega),
+                        1.0, Array<T, 3>(vel, 0., 0.)).clone());
+
+
 /*
     initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
                              CoutteProfile<T>(vel,nx,ny,nz,0,true,2) );
 */  
+
+    // -----------------------------------------------------------
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;
@@ -252,11 +273,9 @@ int main(int argc, char* argv[]) {
     }
     ofile_velocity_gradient_x << std::endl;
     
+    // ---------------------------------------
     // Loop over main time iteration.
     for (plint iT=0; iT<=maxSteps; ++iT) {
-
-      initializeAtEquilibrium(lattice, bottom, 1.0, Array<T, 3>(vel, 0., 0.));
-
       bool initWithVel = false;
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
 

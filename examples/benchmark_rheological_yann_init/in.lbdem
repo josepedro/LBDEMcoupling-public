@@ -9,10 +9,11 @@ boundary	p f p
 newton		off
 
 processors * * *
-region		box block 0. 0.01 0. 0.001 0. 0.002 units box
+#region		box block 0. 0.01 0. 0.002 0. 0.002 units box
+region		box block 0. 0.01 0. 0.00102 0. 0.002 units box
 create_box	1 box
 #read_dump data/d_particles_0.liggghts 0 x y z ix iy iz vx vy vz fx fy fz omegax omegay omegaz radius box yes add yes 
-read_dump data/d_particles_0.liggghts 0 x y z radius box yes add yes 
+read_dump data/d_particles_0.liggghts 0 x y z radius box no add yes 
 
 #read_restart    /home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGHTS-PUBLIC/examples/LIGGGHTS/Tutorials_public/test_3/post/liggghts.restart
 
@@ -44,7 +45,7 @@ pair_coeff	* *
 # shear x => velocity units
 # fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0. shear x 5.0
 fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
-fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.001 
+fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 0.001 shear x 5.0
 
 reset_timestep  0
 

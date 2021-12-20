@@ -108,10 +108,10 @@ int main(int argc, char* argv[]) {
     plbInit(&argc, &argv);
 
     const T d_part = 2*0.0001;
-    //const T dx = 2*0.00001;
-    const T dx = 4*0.00001;
+    const T dx = 2*0.00001;
+    //const T dx = 4*0.00001;
     const T dt = 6*0.0000001;
-    const T lx = 0.01, ly = 0.001, lz = 0.002;
+    const T lx = 0.01, ly = 0.00102, lz = 0.002;
     const T rho_f = 1000;
     const T r_ = d_part/2.;
     const T dynamic_viscosity = 0.1; // (Pa.s or N.s/m^2 or kg/(m.s)) m0
@@ -174,7 +174,7 @@ int main(int argc, char* argv[]) {
     
     const T maxT = 30.0/strain_rate; // Yann's thesis = 20.0/strain_rate
     //const T vtkT = 0.006/8.0;
-    const T vtkT = 0.0000001;
+    const T vtkT = 0.001;
     const T logT = 0.0000001;
 
     const plint maxSteps = units.getLbSteps(maxT);
@@ -189,8 +189,8 @@ int main(int argc, char* argv[]) {
     // set strain rate
     //T vel = units.getLbVel(0.0);
     T vel = units.getLbVel(v_inf);
-    Box3D bottom(0, nx - 1, ny - 1, ny - 1, 0, nz - 1);
-    Box3D lid(0, nx - 1, 0, 0, 0, nz - 1);
+    Box3D lid(0, nx - 1, ny - 1, ny - 1, 0, nz - 1);
+    Box3D bottom(0, nx - 1, 0, 0, 0, nz - 1);
     // Yann's approach
     /*
     OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
@@ -290,7 +290,7 @@ int main(int argc, char* argv[]) {
         ofile_velocity_gradient_x << iT;
         for (plint iY = 0; iY < ny - 1; ++iY) {
           T velocity_gradient = ( units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
-                                                    Box3D(0, nx - 1, iY, iY, 0, nz - 1),
+                                                    Box3D(0, nx - 1, iY + 1, iY + 1, 0, nz - 1),
                                                     0))) - 
                                   units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
                                                     Box3D(0, nx - 1, iY, iY, 0, nz - 1),

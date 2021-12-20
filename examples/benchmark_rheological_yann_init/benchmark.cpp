@@ -200,19 +200,11 @@ int main(int argc, char* argv[]) {
     setBoundaryVelocity(lattice, lid, Array<T, 3>(vel, 0., 0.));
     */
     // VelocityBounceBack's approach
-    /*
     VelocityBounceBack<T,DESCRIPTOR> vbbDynamics_bottom = VelocityBounceBack<T,DESCRIPTOR>(1.0, Array<T, 3>(0., 0., 0.));
     defineDynamics(lattice, bottom, vbbDynamics_bottom.clone());
     VelocityBounceBack<T,DESCRIPTOR> vbbDynamics_lid = VelocityBounceBack<T,DESCRIPTOR>(1.0, Array<T, 3>(vel, 0., 0.));
     defineDynamics(lattice, lid, vbbDynamics_lid.clone());
-    */
-    // PSC's approach
-    defineDynamics(lattice, bottom, 
-      IBcompositeDynamicsSetDensityAndVelocity<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(omega),
-                        1.0, Array<T, 3>(0., 0., 0.)).clone());
-    defineDynamics(lattice, lid, 
-      IBcompositeDynamicsSetDensityAndVelocity<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(omega),
-                        1.0, Array<T, 3>(vel, 0., 0.)).clone());
+
 
 
 /*

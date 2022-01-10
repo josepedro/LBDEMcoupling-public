@@ -271,7 +271,8 @@ namespace plb {
     switch(dimension){
     case 0:
       density = pHi - (pHi-pLo)*(T)iX/(T)(nx-1);
-      velocity[0] = uMax*poiseuilleVelocity(iY,ny)*poiseuilleVelocity(iZ,nz);
+      //velocity[0] = uMax*poiseuilleVelocity(iY,ny)*poiseuilleVelocity(iZ,nz);
+      velocity[0] = uMax*poiseuilleVelocity(iY,ny);
       velocity[1] = 0.;
       velocity[2] = 0.;
       break;

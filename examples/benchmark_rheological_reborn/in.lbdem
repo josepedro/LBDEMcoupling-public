@@ -5,7 +5,7 @@ atom_modify	map array
 
 communicate	single vel yes
 
-boundary	p f f
+boundary	p f p
 newton		off
 
 processors * * *
@@ -16,7 +16,7 @@ variable	skin equal 0.01
 neighbor	${skin} bin
 neigh_modify	delay 0 binsize 0.01 one 1000
 
-fix grav all gravity 0.0 vector 0 0 -1
+#fix grav all gravity 0.0 vector 0 0 -1
 
 
 fix 		m1 all property/global youngsModulus peratomtype 1e8
@@ -32,13 +32,8 @@ fix lbcoupling all couple/lb/onetoone
 pair_style	gran model hertz tangential history rolling_friction cdt
 pair_coeff	* *
 
-
-#fix xwalls1 all wall/gran model hertz tangential history primitive type 1 xplane 0.
-#fix xwalls2 all wall/gran model hertz tangential history primitive type 1 xplane 2.
 fix ywalls1 all wall/gran model hertz tangential history primitive type 1 yplane 0.
 fix ywalls2 all wall/gran model hertz tangential history primitive type 1 yplane 2.
-fix zwalls1 all wall/gran model hertz tangential history primitive type 1 zplane 0.
-fix zwalls2 all wall/gran model hertz tangential history primitive type 1 zplane 2.
 
 # Inserting particles
 #fix		1 all nve/sphere

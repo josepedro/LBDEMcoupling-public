@@ -188,19 +188,33 @@ int main(int argc, char* argv[]) {
 
     writeLogFile(parameters, "sedimenting spheres benchmark");
 
-    // periodic boundary condition on axis X
-    lattice.periodicity().toggle(0,true);
-    Box3D inlet(0,0,1,ny-2,1,nz-2), outlet(nx-1,nx-1,1,ny-2,1,nz-2);
+    lattice.periodicity().toggle(0,true); // periodic boundary condition on axis X
+    lattice.periodicity().toggle(2,true); // periodic boundary condition on axis Z
+    Box3D inlet(0,0,0,ny-1,0,nz-1), outlet(nx-1,nx-1,0,ny-1,0,nz-1);
+
+    // set strain rate
+    T vel = units.getLbVel(0.0);
+    //T vel = units.getLbVel(v_inf);
+    Box3D lid(0, nx - 1, ny - 1, ny - 1, 0, nz - 1);
+    Box3D bottom(0, nx - 1, 0, 0, 0, nz - 1);
+    // Yann's approach
+    OnLatticeBoundaryCondition3D<T, DESCRIPTOR>* boundaryCondition = 
+      createLocalBoundaryCondition3D<T, DESCRIPTOR>();
+    boundaryCondition->addVelocityBoundary1P(bottom, lattice);
+    boundaryCondition->addVelocityBoundary1N(lid, lattice);
+    setBoundaryVelocity(lattice, lid, Array<T, 3>(vel, 0., 0.));
+    setBoundaryVelocity(lattice, bottom, Array<T, 3>(vel, 0., 0.));
     
-    T deltaRho = 0.000001;
+    T deltaRho = 0.005;
     // T rhoHi = 1.+0.5*deltaRho, rhoLo = 1.-0.5*deltaRho;
     T rhoHi = 1., rhoLo = 1.-deltaRho;
 
     // initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
     //                          PressureGradient<T>(rhoHi,rhoLo,nz,0) );
+    /*
     initializeAtEquilibrium( lattice, lattice.getBoundingBox(), 
                              PoiseuilleProfileAndPressureGradient<T>(rhoHi,rhoLo,uMax,nx,ny,nz,0) );
-    
+    */
     lattice.initialize();
     T dt_phys = units.getPhysTime(1);
     plint demSubsteps = 10;
@@ -227,7 +241,34 @@ int main(int argc, char* argv[]) {
 
     clock_t start = clock();
     clock_t loop = clock();
-    clock_t end = clock(); 
+    clock_t end = clock();
+
+    // Outputing information
+    // Energy
+    std::string fname_energy(global::directories().getOutputDir() + "lattice_average_energy.csv");
+    plb_ofstream ofile_energy(fname_energy.c_str());
+    ofile_energy << "iT" << "," << "average_energy" << std::endl;
+
+    // Physical Velocity
+    std::string fname_velocity_x(global::directories().getOutputDir() + "lattice_average_velocity_x.csv");
+    plb_ofstream ofile_velocity_x(fname_velocity_x.c_str());
+    ofile_velocity_x << "iT";
+    for (plint iY = 0; iY < ny; ++iY) {
+      ofile_velocity_x << "," << iY;
+    }
+    ofile_velocity_x << std::endl;
+
+    // Physical Velocity Gradient
+    std::string fname_velocity_gradient_x(
+      global::directories().getOutputDir() + "lattice_average_velocity_gradient_x.csv");
+    plb_ofstream ofile_velocity_gradient_x(fname_velocity_gradient_x.c_str());
+    ofile_velocity_gradient_x << "iT";
+    for (plint iY = 0; iY < ny - 1; ++iY) {
+      ofile_velocity_gradient_x << "," << iY;
+    }
+    ofile_velocity_gradient_x << std::endl;
+    // --------------------------------------
+
     // Loop over main time iteration.
     for (plint iT=0; iT<=maxSteps; ++iT) {
 
@@ -235,8 +276,34 @@ int main(int argc, char* argv[]) {
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
       
 
-      if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
+      if(iT%vtkSteps == 0 && iT > 0) { // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
+        // writing files here
+        // Energy
+        ofile_energy << iT << "," << setprecision(10) << getStoredAverageEnergy<T>(lattice) << std::endl;
+
+        // Physical Velocity
+        ofile_velocity_x << iT;
+        for (plint iY = 0; iY < ny; ++iY) {
+          ofile_velocity_x << "," << setprecision(10) << units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                         Box3D(0, nx - 1, iY, iY, 0, nz - 1),
+                                                         0)));
+        }
+        ofile_velocity_x << std::endl;
+
+        // Physical Velocity Gradient
+        ofile_velocity_gradient_x << iT;
+        for (plint iY = 0; iY < ny - 1; ++iY) {
+          T velocity_gradient = ( units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                    Box3D(0, nx - 1, iY + 1, iY + 1, 0, nz - 1),
+                                                    0))) - 
+                                  units.getPhysVel(computeAverage(*computeVelocityComponent(lattice,
+                                                    Box3D(0, nx - 1, iY, iY, 0, nz - 1),
+                                                    0))) )/units.getPhysLength(1);;
+          ofile_velocity_gradient_x << "," << setprecision(10) << velocity_gradient;
+        }
+        ofile_velocity_gradient_x << std::endl;
+      }
 
       T rhoAvgIn = computeAverageDensity(lattice,inlet);
       T rhoAvgOut = computeAverageDensity(lattice,outlet);
@@ -273,4 +340,7 @@ int main(int argc, char* argv[]) {
           << "total time: " << totaltime
           << " calculating at " << totalmlups << " MLU/s" << std::endl;
 
+    ofile_energy.close();
+    ofile_velocity_x.close();
+    ofile_velocity_gradient_x.close();
 }

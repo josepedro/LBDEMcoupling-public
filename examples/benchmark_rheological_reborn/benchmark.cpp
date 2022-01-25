@@ -216,8 +216,8 @@ int main(int argc, char* argv[]) {
                              PoiseuilleProfileAndPressureGradient<T>(rhoHi,rhoLo,uMax,nx,ny,nz,0) );
     */
     lattice.initialize();
-    T dt_phys = units.getPhysTime(1);
-    plint demSubsteps = 10;
+    T dt_phys = units.getPhysTime(1); // dt_dem = t_step = 0.000266667
+    plint demSubsteps = 10; // dt_phys = dt_dem*demSubsteps; 0.000266667*10 = 0.00266667 = dt_phys
     T dt_dem = dt_phys/(T)demSubsteps;
 
 

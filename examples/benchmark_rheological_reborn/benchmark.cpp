@@ -207,7 +207,7 @@ int main(int argc, char* argv[]) {
     setBoundaryVelocity(lattice, lid, Array<T, 3>(vel, 0., 0.));
     setBoundaryVelocity(lattice, bottom, Array<T, 3>(vel, 0., 0.));
     
-    T deltaRho = 0.005;
+    T deltaRho = 0.0001;
     // T rhoHi = 1.+0.5*deltaRho, rhoLo = 1.-0.5*deltaRho;
     T rhoHi = 1., rhoLo = 1.-deltaRho;
 

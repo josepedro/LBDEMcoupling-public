@@ -178,11 +178,13 @@ int main(int argc, char* argv[]) {
     
     
     const T maxT = ceil(3.*lz/v_inf);
-    const T vtkT = 0.1;
-    //const T vtkT = 1.4;
+    // const T vtkT = 0.1;
+    // const T vtkT = 1.4;
+    const T vtkT = 14.0;
     const T logT = 0.0000001;
 
-    const plint maxSteps = units.getLbSteps(maxT);
+    // const plint maxSteps = units.getLbSteps(maxT);
+    const plint maxSteps = 10000000000000;
     const plint vtkSteps = max<plint>(units.getLbSteps(vtkT),1);
     const plint logSteps = max<plint>(units.getLbSteps(logT),1);
 

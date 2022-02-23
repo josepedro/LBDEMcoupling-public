@@ -86,7 +86,6 @@ int main(int argc, char* argv[]) {
     const T velocity_imposed = strain_rate*ly;
     const T d_part = 0.1; // 1 - particle diameter
     const plint N = 10; // 2 - number of grid points per particle diameter
-    // const plint N = 5;
     const T v_frac = 0.5; // 3 - the solid fraction in the insertion region
     const T nu_f = 1e-4; // 4 - kinematic viscosity (m^2/s)
     // const T v_inf = 0.15;

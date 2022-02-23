@@ -281,8 +281,7 @@ int main(int argc, char* argv[]) {
       bool initWithVel = false;
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
       
-
-      if(iT%vtkSteps == 0 /*&& iT > 0*/) { // LIGGGHTS does not write at timestep 0
+      if(iT%vtkSteps == 0 && iT > 0) { // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
         // writing files here
         // Energy

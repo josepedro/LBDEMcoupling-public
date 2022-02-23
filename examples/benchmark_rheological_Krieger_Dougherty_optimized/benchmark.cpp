@@ -155,13 +155,13 @@ int main(int argc, char* argv[]) {
     // const T vtkT = 0.1;
     // const T vtkT = 0.000000001;
     // const T vtkT = 1.4;
-    const T vtkT = 14.0;
+    const T vtkT = 70.0;
     const T logT = 0.0000001;
 
     // const plint maxSteps = units.getLbSteps(maxT);
-    // const plint maxSteps = 10000000000000;
+    const plint maxSteps = 10000000000000;
     // const plint maxSteps = 10;
-    const plint maxSteps = 100;
+    // const plint maxSteps = 100;
     const plint vtkSteps = max<plint>(units.getLbSteps(vtkT),1);
     const plint logSteps = max<plint>(units.getLbSteps(logT),1);
 
@@ -283,7 +283,7 @@ int main(int argc, char* argv[]) {
       
 
       if(iT%vtkSteps == 0 /*&& iT > 0*/) { // LIGGGHTS does not write at timestep 0
-        // writeVTK(lattice,parameters,units,iT);
+        writeVTK(lattice,parameters,units,iT);
         // writing files here
         // Energy
         ofile_energy << iT << "," << setprecision(10) << getStoredAverageEnergy<T>(lattice) << std::endl;

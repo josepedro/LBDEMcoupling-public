@@ -334,9 +334,6 @@ int main(int argc, char* argv[]) {
         ofile_relative_apparent_viscosity_averaged << std::endl;
       }
 
-      T rhoAvgIn = computeAverageDensity(lattice,inlet);
-      T rhoAvgOut = computeAverageDensity(lattice,outlet);
-
       lattice.collideAndStream();
 
       getForcesFromLattice(lattice,wrapper,units);

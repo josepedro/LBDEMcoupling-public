@@ -82,19 +82,14 @@ int main(int argc, char* argv[]) {
     plbInit(&argc, &argv);
     
     const T lx = 5., ly = 0.5, lz = 1.;
-    const T strain_rate = 0.0005;
+    const T strain_rate = 0.0002;
     const T velocity_imposed = strain_rate*ly;
     const T d_part = 0.1; // 1 - particle diameter
     const plint N = 5; // 2 - number of grid points per particle diameter
     const T v_frac = 0.5; // 3 - the solid fraction in the insertion region
     const T nu_f = 1e-4; // 4 - kinematic viscosity (m^2/s)
-    // const T v_inf = 0.15;
-    // const T v_inf = 0.15; // 5 - velocity of the particle (v_inf is an estimated settling velocity)
-    // const T v_inf = velocity_imposed; // try_2
-    const T v_inf = velocity_imposed/2.0; // try_3
-    const T optimization_factor = 2.0/150.0; // dt_phys: 0.064 0.008
-    
-    const T uMax = 0.02 * optimization_factor; /* 6 - maybe this is the ULB 
+    const T v_inf = velocity_imposed;
+    const T uMax = 0.0002; /* 6 - maybe this is the ULB 
     - uMax is the maximum velocity in LB units, proportional to the Mach number -
     Characteristic velocity in lattice units (proportional to Mach number). */
     const std::string outDir = "outDir/"; /* 7 - directory where your output shall be stored. It must
@@ -154,8 +149,8 @@ int main(int argc, char* argv[]) {
     const T maxT = ceil(3.*lz/v_inf);
     // const T vtkT = 0.1;
     // const T vtkT = 0.000000001;
-     const T vtkT = 1.4;
-    //const T vtkT = 70.0;
+    // const T vtkT = 1.4;
+    const T vtkT = 140.0;
     const T logT = 0.0000001;
 
     // const plint maxSteps = units.getLbSteps(maxT);

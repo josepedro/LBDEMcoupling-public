@@ -82,7 +82,7 @@ int main(int argc, char* argv[]) {
     plbInit(&argc, &argv);
     
     const T lx = 5., ly = 0.5, lz = 1.;
-    const T strain_rate = 0.02;
+    const T strain_rate = 0.04;
     const T velocity_imposed = strain_rate*ly;
     const T d_part = 0.1; // 1 - particle diameter
     const plint N = 5; // 2 - number of grid points per particle diameter
@@ -146,8 +146,8 @@ int main(int argc, char* argv[]) {
     
     const T maxT = ceil(3.*lz/v_inf);
     // const T vtkT = 0.1;
-    // const T vtkT = 0.000000001;
-    const T vtkT = 1.4;
+    const T vtkT = 0.000000001;
+    // const T vtkT = 1.4;
     //const T vtkT = 140.0;
     const T logT = 0.0000001;
 

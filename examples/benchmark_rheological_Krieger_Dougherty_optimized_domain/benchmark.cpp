@@ -82,14 +82,13 @@ int main(int argc, char* argv[]) {
     plbInit(&argc, &argv);
     
     const T lx = 5., ly = 0.5, lz = 1.;
-    const T strain_rate = 0.0002;
+    const T strain_rate = 0.02;
     const T velocity_imposed = strain_rate*ly;
     const T d_part = 0.1; // 1 - particle diameter
     const plint N = 5; // 2 - number of grid points per particle diameter
-    const T v_frac = 0.5; // 3 - the solid fraction in the insertion region
-    const T nu_f = 1e-4; // 4 - kinematic viscosity (m^2/s)
+    const T nu_f = 0.02; // 4 - kinematic viscosity (m^2/s)
     const T v_inf = velocity_imposed;
-    const T uMax = 0.0002; /* 6 - maybe this is the ULB 
+    const T uMax = velocity_imposed*4./30.; /* 6 - this is the ULB 
     - uMax is the maximum velocity in LB units, proportional to the Mach number -
     Characteristic velocity in lattice units (proportional to Mach number). */
     const std::string outDir = "outDir/"; /* 7 - directory where your output shall be stored. It must
@@ -97,8 +96,8 @@ int main(int argc, char* argv[]) {
 
     const T rho_f = 1000;
     const T r_ = d_part/2.;
-    const T rho_s = 1100.;
-    const T m = r_*r_*r_*4./3.*3.14*rho_s;
+    // const T rho_s = 1100.;
+    // const T m = r_*r_*r_*4./3.*3.14*rho_s;
     const T Rep = d_part*velocity_imposed/nu_f;
 
     std::string lbOutDir(outDir), demOutDir(outDir);
@@ -110,7 +109,6 @@ int main(int argc, char* argv[]) {
     // particle size and volume fraction are handed over to LIGGGHTS 
     // as variables (see LIGGGHTS docu for details)
     wrapper.setVariable("r_part",d_part/2);
-    wrapper.setVariable("v_frac",v_frac);
     wrapper.execFile("in.lbdem");
     
     PhysUnits3D<T> units(2.*r_,v_inf,nu_f,lx,ly,lz,N,uMax,rho_f);
@@ -149,8 +147,8 @@ int main(int argc, char* argv[]) {
     const T maxT = ceil(3.*lz/v_inf);
     // const T vtkT = 0.1;
     // const T vtkT = 0.000000001;
-    // const T vtkT = 1.4;
-    const T vtkT = 140.0;
+    const T vtkT = 1.4;
+    //const T vtkT = 140.0;
     const T logT = 0.0000001;
 
     // const plint maxSteps = units.getLbSteps(maxT);
@@ -204,7 +202,44 @@ int main(int argc, char* argv[]) {
           << "velocity_imposed: " << velocity_imposed << "\n"
           << "uMax (ULB) in physical units: " << units.getPhysVel(uMax) << "\n"
           << "uMax (ULB) in lattice units: " << uMax << "\n"
+          << "nu_f: " << nu_f << "\n"
           << "------------------------------" << std::endl;
+    // Outputing information
+    // Energy
+    std::string fname_simulation_info(global::directories().getOutputDir() + "simulation_info.csv");
+    plb_ofstream ofile_simulation_info(fname_simulation_info.c_str());
+    ofile_simulation_info << "omega" << "," 
+    << "dt_phys" << "," 
+    << "dt_dem" << "," 
+    << "dx_phys" << ","
+    << "v_inf" << ","
+    << "Rep" << ","
+    << "vtkT" << ","
+    << "vtkSteps" << ","
+    << "nx" << ","
+    << "ny" << ","
+    << "nz" << ","
+    << "strain_rate" << ","
+    << "uMax_phys" << ","
+    << "uMax" << ","
+    << "nu_f" << std::endl;
+    ofile_simulation_info << parameters.getOmega() << "," 
+    << dt_phys << "," 
+    << dt_dem << "," 
+    << units.getPhysLength(1) << ","
+    << v_inf << ","
+    << Rep << ","
+    << vtkT << ","
+    << vtkSteps << ","
+    << nx << ","
+    << ny << ","
+    << nz << ","
+    << strain_rate << ","
+    << units.getPhysVel(uMax) << ","
+    << uMax << ","
+    << nu_f << std::endl;
+    ofile_simulation_info.close();
+
     // set timestep and output directory
     wrapper.setVariable("t_step",dt_dem);
     wrapper.setVariable("dmp_stp",vtkSteps*demSubsteps);

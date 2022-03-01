@@ -19,7 +19,7 @@ variable	skin equal 0.01
 neighbor	${skin} bin
 neigh_modify	delay 0 binsize 0.01 one 1000
 
-fix grav all gravity 0.0 vector 0 -1 0
+fix grav all gravity 10.0 vector 0 -1 0
 
 
 fix 		m1 all property/global youngsModulus peratomtype 1e8

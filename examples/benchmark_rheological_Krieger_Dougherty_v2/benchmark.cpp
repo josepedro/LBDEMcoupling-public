@@ -45,10 +45,10 @@ using namespace std;
 
 typedef double T; // float
 
-#define DESCRIPTOR descriptors::D3Q27Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
-//#define DESCRIPTOR descriptors::D3Q19Descriptor // try
-//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DESCRIPTOR descriptors::D3Q27Descriptor
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+#define DESCRIPTOR descriptors::D3Q19Descriptor
+#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 //#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new Kdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 
 void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
@@ -313,7 +313,7 @@ int main(int argc, char* argv[]) {
       setSpheresOnLattice(lattice,wrapper,units,initWithVel);
       
 
-      if(iT%vtkSteps == 0 /*&& iT > 0*/) { // LIGGGHTS does not write at timestep 0
+      if(iT%vtkSteps == 0 && iT > 0) { // LIGGGHTS does not write at timestep 0
         writeVTK(lattice,parameters,units,iT);
         // writing files here
         // Energy
@@ -383,7 +383,7 @@ int main(int argc, char* argv[]) {
 
       wrapper.run(demSubsteps);
 
-
+      /*
       if(iT%logSteps == 0){
         end = clock();
         T time = difftime(end,loop)/((T)CLOCKS_PER_SEC);
@@ -393,7 +393,7 @@ int main(int argc, char* argv[]) {
         pcout << "calculating at " << mlups << " MLU/s"
               << " | total time running: " << totaltime << std::endl;
         loop = clock();
-      }
+      }*/
     }
     T totaltime = difftime(end,start)/((T)CLOCKS_PER_SEC);
     T totalmlups = ((T) (lattice.getNx()*lattice.getNy()*lattice.getNz()*(maxSteps+1)))/totaltime/1e6;

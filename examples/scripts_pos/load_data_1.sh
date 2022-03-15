@@ -23,3 +23,9 @@ scp desantan@login1.yggdrasil.hpc.unige.ch:/home/users/d/desantan/scratch/LBDEM/
 scp desantan@login1.yggdrasil.hpc.unige.ch:/home/users/d/desantan/scratch/LBDEM/LBDEMcoupling-public/examples/benchmark_rheological_Krieger_Dougherty/outDir/tmp/relative_apparent_viscosity.csv . && \
 echo " ----- Data from Yggdrasil benchmark_rheological_Krieger_Dougherty uploaded already -----"
 
+echo " ----- Getting data from Yggdrasil benchmark_rheological_Krieger_Dougherty_vf_0.2 case ----- "
+cd /home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public/examples/benchmark_rheological_Krieger_Dougherty_vf_0.2/tmp_trash && \
+scp desantan@login1.yggdrasil.hpc.unige.ch:/home/users/d/desantan/scratch/LBDEM/LBDEMcoupling-public/examples/benchmark_rheological_Krieger_Dougherty_vf_0.2/outDir/tmp/lattice_average_energy.csv . && \
+scp desantan@login1.yggdrasil.hpc.unige.ch:/home/users/d/desantan/scratch/LBDEM/LBDEMcoupling-public/examples/benchmark_rheological_Krieger_Dougherty_vf_0.2/outDir/tmp/relative_apparent_viscosity.csv . && \
+echo " ----- Data from Yggdrasil benchmark_rheological_Krieger_Dougherty_vf_0.2 uploaded already -----"
+

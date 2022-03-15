@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.8.12)
 set(PALABOS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/palabos")
-set(LIGGGHTS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGHTS-PUBLIC")
+set(LIGGGHTS_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LIGGGHTS-PUBLIC_official")
 set(LBDEM_ROOT "/home/pedro/singularity/singularity-ce-3.8.1/workspace/LBDEMcoupling-public")
 
 project(LBDEMcouplingSedimentingSphere)

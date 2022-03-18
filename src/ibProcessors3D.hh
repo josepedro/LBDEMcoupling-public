@@ -61,7 +61,7 @@ namespace plb{
           
           IBdynamicsParticleData<T,Descriptor>* particleData =
             getParticleDataFromCell<T,Descriptor>(cell);
-
+          
           if(!particleData) continue;
 
           // this one actually helps, believe it or not
@@ -81,7 +81,7 @@ namespace plb{
           T const dz_com = zGlobal - com[2];
 
           T const sf = calcSolidFraction(dx,dy,dz,r);
-
+          
           T const sf_old = particleData->solidFraction;
           int const id_old = (int) particleData->partId;
           
@@ -107,6 +107,12 @@ namespace plb{
           if(initVelFlag && sf > SOLFRAC_MAX)
             cell.defineVelocity(particleData->uPart);
 
+          /*
+          IBdynamicsParticleData<T,Descriptor>* particleDataTest =
+            getParticleDataFromCell<T,Descriptor>(cell);
+          if (particleDataTest->solidFraction > 0)
+            pcout << "particleDataTest.solidFraction: " << particleDataTest->solidFraction << std::endl;
+          */
         }
       }
     }

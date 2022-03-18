@@ -171,6 +171,24 @@ int main(int argc, char* argv[]) {
     plint demSubsteps = 10;
     plint envelopeWidth = 1;
 
+    auto partialBBTRTdynamics = new PartialBBTRTdynamics<T, DESCRIPTOR>(parameters.getOmega());
+    // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
+    partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
+                              1/4);
+
+  
+    MultiBlockLattice3D<T, DESCRIPTOR> 
+      lattice (MultiBlockManagement3D (blockStructure, 
+                                       threadAttribution, 
+                                       envelopeWidth ),
+               defaultMultiBlockPolicy3D().getBlockCommunicator(),
+               defaultMultiBlockPolicy3D().getCombinedStatistics(),
+               defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
+               partialBBTRTdynamics->clone() );
+    defineDynamics(lattice, lattice.getBoundingBox(), 
+      partialBBTRTdynamics->clone());
+  
+/*  
     MultiBlockLattice3D<T, DESCRIPTOR> 
       lattice (MultiBlockManagement3D (blockStructure, 
                                        threadAttribution, 
@@ -179,10 +197,8 @@ int main(int argc, char* argv[]) {
                defaultMultiBlockPolicy3D().getCombinedStatistics(),
                defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
                new DYNAMICS );
-
-
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);
-
+*/  
     lattice.periodicity().toggleAll(false);
 
 
@@ -213,6 +229,7 @@ int main(int argc, char* argv[]) {
 
     // Loop over main time iteration.
     for (plint iT=0; iT<maxSteps; ++iT) {
+    //for (plint iT=0; iT<1; ++iT) {
 
       setSpheresOnLattice(lattice,wrapper,units,false);
     
@@ -234,10 +251,9 @@ int main(int argc, char* argv[]) {
         pcout << "time: " << time << " " ;
         pcout << "calculating at " << mlups << " MLU/s" << std::endl;
         start = clock();
-
-      }
-
+      }/*
+      */
       
     }
-
+  
 }

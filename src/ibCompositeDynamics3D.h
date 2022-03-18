@@ -65,6 +65,54 @@ namespace plb {
     static Array<T,Descriptor<T>::q> fPre;
   };
 
+  template<typename T, template<typename U> class Descriptor>
+  class PartialBBTRTdynamics : public BaseTRTdynamics<T,Descriptor>{
+  public:
+    // inherit constructors
+    using BaseTRTdynamics<T, Descriptor>::BaseTRTdynamics;
+    /// Clone the object on its dynamic type.
+    PartialBBTRTdynamics<T,Descriptor>* clone() const override;
+
+    /// Return a unique ID for this class.
+    int getId() const override;
+
+    virtual void serialize(HierarchicSerializer& serializer) const;
+
+    virtual void unserialize(HierarchicUnserializer& unserializer);
+
+    /* *************** Collision and Equilibrium ************************* */
+
+    /// Implementation of the collision step
+    void collide(Cell<T,Descriptor>& cell,
+                         BlockStatistics& statistics_) override;
+
+    
+
+    /// Implementation of the collision step, with imposed macroscopic variables
+    void collideExternal(Cell<T,Descriptor>& cell, T rhoBar,
+                                 Array<T,Descriptor<T>::d> const& j, T thetaBar, BlockStatistics& stat) override;
+
+    /// Compute equilibrium distribution function
+    T computeEquilibrium(plint iPop, T rhoBar, Array<T,Descriptor<T>::d> const& j,
+                                 T jSqr, T thetaBar=T()) const override;
+
+    /// if desired, initialize interior of sphere with sphere velocity
+    void defineVelocity(Cell<T,Descriptor>& cell, 
+                        Array<T,Descriptor<T>::d> const& u);
+
+    IBdynamicsParticleData<T,Descriptor> particleData;
+
+  private:
+    static int id;
+
+    // performance tweaks
+    // // have static variables for some temporary quantities
+    // // to save memory
+    static Array<T,Descriptor<T>::q> fEqSolid;
+    static Array<T,Descriptor<T>::q> fEq;
+    static Array<T,Descriptor<T>::q> fPre;
+  };
+
 }; /* namespace plb */
 
 #include "ibCompositeDynamics3D.hh"

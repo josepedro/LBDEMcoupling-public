@@ -142,7 +142,6 @@ namespace plb {
     // this one returns modif::staticVariables and forces an update of those along processor
     // boundaries
     applyProcessingFunctional(new AttributeFunctional<T,Descriptor>(),lattice.getBoundingBox(),lattice);
-
   }
 
   template<typename T, template<typename U> class Descriptor>

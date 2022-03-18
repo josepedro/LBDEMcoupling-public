@@ -53,6 +53,15 @@ namespace plb {
         return &( (static_cast< IBcompositeDynamics<T,Descriptor>* >(dyn))->particleData );
     }
 
+    // For PartialBBTRTdynamics
+    static PartialBBTRTdynamics<T,Descriptor> const trtdyn( dyn->getOmega() );
+    static plint const trtdynId = trtdyn.getId();
+    if(cell.getDynamics().getId() == trtdynId){
+      return &( (static_cast< PartialBBTRTdynamics<T,Descriptor>* >(&cell.getDynamics()))->particleData );
+    } 
+    /*
+    */
+    
     return 0;
   }
 

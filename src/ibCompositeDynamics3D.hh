@@ -209,6 +209,18 @@ namespace plb {
     meta::registerGeneralDynamics<T,Descriptor,PartialBBTRTdynamics<T,Descriptor> >("PartialBBTRT");
 
   template<typename T, template<typename U> class Descriptor>
+  PartialBBTRTdynamics<T,Descriptor>::PartialBBTRTdynamics(HierarchicUnserializer &unserializer)
+    : BaseTRTdynamics<T,Descriptor>(T())
+  {
+    unserialize(unserializer);
+  }
+
+  template<typename T, template<typename U> class Descriptor>
+  PartialBBTRTdynamics<T,Descriptor>::PartialBBTRTdynamics(const PartialBBTRTdynamics &orig)
+    : BaseTRTdynamics<T,Descriptor>(orig)
+  { }
+
+  template<typename T, template<typename U> class Descriptor>
   PartialBBTRTdynamics<T,Descriptor>* PartialBBTRTdynamics<T,Descriptor>::clone() const {
     return new PartialBBTRTdynamics<T, Descriptor>(*this);
   }

@@ -70,6 +70,12 @@ namespace plb {
   public:
     // inherit constructors
     using BaseTRTdynamics<T, Descriptor>::BaseTRTdynamics;
+
+    //PartialBBTRTdynamics();
+    PartialBBTRTdynamics(const PartialBBTRTdynamics &orig);
+    PartialBBTRTdynamics(HierarchicUnserializer &unserializer);
+    //~PartialBBTRTdynamics();
+
     /// Clone the object on its dynamic type.
     PartialBBTRTdynamics<T,Descriptor>* clone() const override;
 
@@ -85,8 +91,6 @@ namespace plb {
     /// Implementation of the collision step
     void collide(Cell<T,Descriptor>& cell,
                          BlockStatistics& statistics_) override;
-
-    
 
     /// Implementation of the collision step, with imposed macroscopic variables
     void collideExternal(Cell<T,Descriptor>& cell, T rhoBar,

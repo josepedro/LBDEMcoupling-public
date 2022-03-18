@@ -175,8 +175,9 @@ int main(int argc, char* argv[]) {
     // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
     partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
                               1/4);
-
   
+
+    pcout << "MultiBlockLattice3D<T, DESCRIPTOR> " << std::endl;
     MultiBlockLattice3D<T, DESCRIPTOR> 
       lattice (MultiBlockManagement3D (blockStructure, 
                                        threadAttribution, 
@@ -185,8 +186,10 @@ int main(int argc, char* argv[]) {
                defaultMultiBlockPolicy3D().getCombinedStatistics(),
                defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
                partialBBTRTdynamics->clone() );
+    pcout << "defineDynamics(lattice, lattice.getBoundingBox() " << std::endl;
     defineDynamics(lattice, lattice.getBoundingBox(), 
       partialBBTRTdynamics->clone());
+    pcout << "--------------0000000-------------------------- " << std::endl;
   
 /*  
     MultiBlockLattice3D<T, DESCRIPTOR> 
@@ -201,7 +204,7 @@ int main(int argc, char* argv[]) {
 */  
     lattice.periodicity().toggleAll(false);
 
-
+    pcout << "T dt_phys = units.getPhysTime(1); " << std::endl;
     T dt_phys = units.getPhysTime(1);
     pcout << "omega: " << parameters.getOmega() << "\n" 
           << "dt_phys: " << dt_phys << "\n"
@@ -212,8 +215,9 @@ int main(int argc, char* argv[]) {
           << parameters.getNy() << " "
           << parameters.getNz() << std::endl;
     
+    pcout << "lattice.initialize(); " << std::endl;
     lattice.initialize();
-
+    pcout << "T dt_dem = dt_phys/(T)demSubsteps; " << std::endl;
 
     T dt_dem = dt_phys/(T)demSubsteps;
 
@@ -226,7 +230,7 @@ int main(int argc, char* argv[]) {
 
     clock_t start = clock();    
 
-
+    pcout << "plint iT=0; iT<maxSteps " << std::endl;
     // Loop over main time iteration.
     for (plint iT=0; iT<maxSteps; ++iT) {
     //for (plint iT=0; iT<1; ++iT) {

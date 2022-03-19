@@ -46,7 +46,7 @@ using namespace std;
 typedef double T;
 
 #define DESCRIPTOR descriptors::D3Q27Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new CompleteRegularizedBGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 //#define DESCRIPTOR descriptors::D3Q19Descriptor
 //#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new RRdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 
@@ -137,6 +137,22 @@ int main(int argc, char* argv[]) {
     ExplicitThreadAttribution* threadAttribution = lDec.getThreadAttribution();
     plint envelopeWidth = 1;
 
+    auto partialBBTRTdynamics = new PartialBBTRTdynamics<T, DESCRIPTOR>(parameters.getOmega());
+    // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
+    partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
+                              1/4);
+    // partialBBTRTdynamics->clone()
+
+    MultiBlockLattice3D<T, DESCRIPTOR> 
+      lattice (MultiBlockManagement3D (blockStructure, threadAttribution, envelopeWidth ),
+               defaultMultiBlockPolicy3D().getBlockCommunicator(),
+               defaultMultiBlockPolicy3D().getCombinedStatistics(),
+               defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
+               partialBBTRTdynamics->clone() );
+
+    defineDynamics(lattice,lattice.getBoundingBox(), partialBBTRTdynamics->clone());
+
+    /*
     MultiBlockLattice3D<T, DESCRIPTOR> 
       lattice (MultiBlockManagement3D (blockStructure, threadAttribution, envelopeWidth ),
                defaultMultiBlockPolicy3D().getBlockCommunicator(),
@@ -145,7 +161,8 @@ int main(int argc, char* argv[]) {
                new DYNAMICS );
 
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);
-    
+    */
+
     const T maxT = ceil(3.*lz/v_inf);
     // const T vtkT = 0.1;
     // const T vtkT = 0.000000001;

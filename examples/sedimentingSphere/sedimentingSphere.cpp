@@ -11,8 +11,20 @@
   E3: 962 ; 0.113 ; 0.091
   E4: 960 ; 0.058 ; 0.128
 
-  Re: 32.2
+  Re: 32.2                              [3]   [4]  [1] 
   mpirun -np 4 sedimentingSphere 8 0.02 960 0.058 0.128 1.5 outDir/
+
+  Re: 11.6
+  mpirun -np 4 sedimentingSphere 8 0.02 962 0.113 0.091 2.0 outDir/
+
+  Re: 4.096698113207547 = 4.1
+  mpirun -np 4 sedimentingSphere 8 0.02 965 0.212 0.06 2.0 outDir/
+
+  Re: 1.48230 = 1.5
+  mpirun -np 4 sedimentingSphere 8 0.02 970 0.373 0.038 2.0 outDir/
+
+
+  T r_ = 0.015/2.;
   
  */
 

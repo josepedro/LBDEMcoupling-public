@@ -50,8 +50,9 @@ using namespace std;
 
 typedef double T;
 
-#define DESCRIPTOR descriptors::D3Q19Descriptor
-#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new BGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
+//#define DESCRIPTOR descriptors::D3Q19Descriptor
+#define DESCRIPTOR descriptors::D3Q27Descriptor
+//#define DYNAMICS IBcompositeDynamics<T,DESCRIPTOR>(new BGKdynamics<T,DESCRIPTOR>(parameters.getOmega()))
 
 void writeVTK(MultiBlockLattice3D<T,DESCRIPTOR>& lattice,
               IncomprFlowParam<T> const& parameters,
@@ -187,6 +188,7 @@ int main(int argc, char* argv[]) {
     // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
     partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
                               1/4);
+    // partialBBTRTdynamics->clone()
   
 
     pcout << "MultiBlockLattice3D<T, DESCRIPTOR> " << std::endl;

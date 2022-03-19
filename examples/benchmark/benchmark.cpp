@@ -184,6 +184,14 @@ int main(int argc, char* argv[]) {
     ExplicitThreadAttribution* threadAttribution = lDec.getThreadAttribution();
     plint envelopeWidth = 1;
 
+    auto partialBBTRTdynamics = new PartialBBTRTdynamics<T, DESCRIPTOR>(parameters.getOmega());
+    // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
+    partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
+                              1/4);
+    // partialBBTRTdynamics->clone()
+
+
+    /*
     MultiBlockLattice3D<T, DESCRIPTOR> 
       lattice (MultiBlockManagement3D (blockStructure, threadAttribution, envelopeWidth ),
                defaultMultiBlockPolicy3D().getBlockCommunicator(),
@@ -192,9 +200,20 @@ int main(int argc, char* argv[]) {
                new DYNAMICS );
 
     defineDynamics(lattice,lattice.getBoundingBox(),new DYNAMICS);
+    */
+
+
+    MultiBlockLattice3D<T, DESCRIPTOR> 
+      lattice (MultiBlockManagement3D (blockStructure, threadAttribution, envelopeWidth ),
+               defaultMultiBlockPolicy3D().getBlockCommunicator(),
+               defaultMultiBlockPolicy3D().getCombinedStatistics(),
+               defaultMultiBlockPolicy3D().getMultiCellAccess<T,DESCRIPTOR>(),
+               partialBBTRTdynamics->clone() );
+
+    defineDynamics(lattice,lattice.getBoundingBox(), partialBBTRTdynamics->clone());
     
     
-    const T maxT = ceil(3.*lz/v_inf);
+    const T maxT = ceil(3.*lz/v_inf)/3.8;
     const T vtkT = 0.1;
     const T logT = 0.0000001;
 
@@ -233,11 +252,11 @@ int main(int argc, char* argv[]) {
     clock_t loop = clock();
     clock_t end = clock(); 
     // Loop over main time iteration.
-    //for (plint iT=0; iT<=maxSteps; ++iT) {
-    for (plint iT=0; iT<=10; ++iT) {
+    for (plint iT=0; iT<=maxSteps; ++iT) {
+    //for (plint iT=0; iT<=10; ++iT) {
 
       bool initWithVel = false;
-      //setSpheresOnLattice(lattice,wrapper,units,initWithVel);
+      setSpheresOnLattice(lattice,wrapper,units,initWithVel);
       
 
       if(iT%vtkSteps == 0 && iT > 0) // LIGGGHTS does not write at timestep 0
@@ -245,9 +264,9 @@ int main(int argc, char* argv[]) {
 
       lattice.collideAndStream();
 
-      //getForcesFromLattice(lattice,wrapper,units);
+      getForcesFromLattice(lattice,wrapper,units);
 
-      //wrapper.run(demSubsteps);
+      wrapper.run(demSubsteps);
 
 
       if(iT%logSteps == 0){

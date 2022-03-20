@@ -82,19 +82,21 @@ int main(int argc, char* argv[]) {
     plbInit(&argc, &argv);
     
     const T d_part = 0.1; // 1 - particle diameter
+    // const plint N = 5;
     const plint N = 10; // 2 - number of grid points per particle diameter
-    const T v_frac = 0.5; // 3 - the solid fraction in the insertion region
-    const T nu_f = 1e-4; // 4 - kinematic viscosity (m^2/s)
-    const T v_inf = 0.15; // 5 - velocity of the particle (v_inf is an estimated settling velocity)
-    const T uMax = 0.02; /* 6 - maybe this is the ULB 
+    // const T v_frac = 0.5; // 3 - the solid fraction in the insertion region
+    const T nu_f = 0.0033333333333333335; // 4 - kinematic viscosity (m^2/s)
+    // const T v_inf = 0.15; // 5 - velocity of the particle (v_inf is an estimated settling velocity)
+    const T uMax = 0.0013333333333333335; /* 6 - maybe this is the ULB 
     - uMax is the maximum velocity in LB units, proportional to the Mach number -
     Characteristic velocity in lattice units (proportional to Mach number). */
     const std::string outDir = "outDir/"; /* 7 - directory where your output shall be stored. It must
     contain the subdirectories outDir/post and outDir/tmp. */
 
     const T lx = 1., ly = 1., lz = 1.;
-    const T strain_rate = 0.00005;
+    const T strain_rate = 0.0033333333333333335; 
     const T velocity_imposed = strain_rate*ly;
+    const T v_inf = velocity_imposed; // 5 - velocity of the particle (v_inf is an estimated settling velocity)
     const T rho_f = 1000;
     const T r_ = d_part/2.;
     const T rho_s = 1100.;
@@ -110,23 +112,12 @@ int main(int argc, char* argv[]) {
     // particle size and volume fraction are handed over to LIGGGHTS 
     // as variables (see LIGGGHTS docu for details)
     wrapper.setVariable("r_part",d_part/2);
-    wrapper.setVariable("v_frac",v_frac);
     wrapper.execFile("in.lbdem");
     
     PhysUnits3D<T> units(2.*r_,v_inf,nu_f,lx,ly,lz,N,uMax,rho_f);
 
     IncomprFlowParam<T> parameters(units.getLbParam());
     
-    ///// Initialize the diagonal relaxation matrix from the .xml file.
-    // Q19 and Q27 do not have the same number of relaxation parameters!
-    Array<T, DESCRIPTOR<T>::numRelaxationTimes> allOmega;
-    allOmega[0] = parameters.getOmega();     // relaxation of M200 and cyclic permutations
-    allOmega[1] = parameters.getOmega();     // relaxation of M110 and cyclic permutations
-    allOmega[2] = parameters.getOmega();    // relaxation of M210 and cyclic permutations
-    allOmega[3] = parameters.getOmega();    // relaxation of M220 and cyclic permutations
-    allOmega[4] = 1.0; // relaxation of bulk moment (M200 + M020 + M002)
-    RRdynamics<T,DESCRIPTOR>::allOmega = allOmega;
-
     plint nx = parameters.getNx(), ny = parameters.getNy(), nz = parameters.getNz();
 
     // get lattice decomposition from LIGGGHTS and create lattice according to parallelization
@@ -167,7 +158,7 @@ int main(int argc, char* argv[]) {
     // const T vtkT = 0.1;
     // const T vtkT = 0.000000001;
     // const T vtkT = 1.4;
-    const T vtkT = 14.0;
+    const T vtkT = 140.0/4.;
     const T logT = 0.0000001;
 
     // const plint maxSteps = units.getLbSteps(maxT);
@@ -202,7 +193,7 @@ int main(int argc, char* argv[]) {
     */
     lattice.initialize();
     T dt_phys = units.getPhysTime(1); // dt_dem = t_step = 0.000266667
-    plint demSubsteps = 10; // dt_phys = dt_dem*demSubsteps; 0.000266667*10 = 0.00266667 = dt_phys
+    plint demSubsteps = 7; // dt_phys = dt_dem*demSubsteps; 0.000266667*10 = 0.00266667 = dt_phys
     T dt_dem = dt_phys/(T)demSubsteps;
 
 

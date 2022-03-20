@@ -18,6 +18,11 @@
  * Author: Philippe Seil (philippe.seil@jku.at)
  */
 
+
+ /*
+  * KARAOTE
+  */
+
 #include "palabos3D.h"
 #include "palabos3D.hh"
 

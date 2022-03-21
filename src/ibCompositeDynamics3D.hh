@@ -287,6 +287,8 @@ namespace plb {
     if(particleData.solidFraction > SOLFRAC_MIN)
       fPre = cell.getRawPopulations();
 
+    // expensive
+    // test with one more and check the memory
     auto trtDynamics = new TRTdynamics<T, Descriptor>(this->getOmega());
     trtDynamics->setParameter(dynamicParams::magicParameter,
                               this->getParameter(dynamicParams::magicParameter));

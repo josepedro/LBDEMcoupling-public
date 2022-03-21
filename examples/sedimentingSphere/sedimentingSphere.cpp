@@ -15,16 +15,17 @@
   mpirun -np 4 sedimentingSphere 8 0.02 960 0.058 0.128 1.5 outDir/
 
   Re: 11.6
-  mpirun -np 4 sedimentingSphere 8 0.02 962 0.113 0.091 2.0 outDir/
+  mpirun -np 6 sedimentingSphere 8 0.02 962 0.113 0.091 1.7 outDir_re_11/
 
   Re: 4.096698113207547 = 4.1
-  mpirun -np 4 sedimentingSphere 8 0.02 965 0.212 0.06 2.0 outDir/
+  mpirun -np 6 sedimentingSphere 8 0.02 965 0.212 0.06 2.6 outDir_re_4/
 
   Re: 1.48230 = 1.5
-  mpirun -np 4 sedimentingSphere 8 0.02 970 0.373 0.038 2.0 outDir/
+  mpirun -np 6 sedimentingSphere 8 0.02 970 0.373 0.038 4.13 outDir_re_1/
 
 
   T r_ = 0.015/2.;
+  karaote
   
  */
 
@@ -185,11 +186,6 @@ int main(int argc, char* argv[]) {
     plint envelopeWidth = 1;
 
     auto partialBBTRTdynamics = new PartialBBTRTdynamics<T, DESCRIPTOR>(parameters.getOmega());
-    // pg 429 of Kruger's book says that 1/4 provides the most stable simulations
-    partialBBTRTdynamics->setParameter(dynamicParams::magicParameter,
-                              1/4);
-    // partialBBTRTdynamics->clone()
-  
 
     pcout << "MultiBlockLattice3D<T, DESCRIPTOR> " << std::endl;
     MultiBlockLattice3D<T, DESCRIPTOR> 
